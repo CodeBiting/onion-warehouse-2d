@@ -111,7 +111,7 @@ Let's install the precommit package: `npm install pre-commit --save-dev` The pre
 
 #### GitHub actions
 
-So that when the project is uploaded the tests are passed again, inside hithub the action "" is added which creates the `.github/workflows/node.js.yml` file where we specify the tests to be they have to run
+So that when the project is uploaded the tests are passed again, inside hithub the action "Node.js" is added which creates the `.github/workflows/node.js.yml` file where we specify the tests to be they have to run
 
 Now every time we commit, apart from running the tests via git pre-commit, the tests will be uploaded and run on github. This test execution will be done in triplicate, one for each version of Node.js specified in the workflow configuration file `.github/workflows/node.js.yml`.
 
