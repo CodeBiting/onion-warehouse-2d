@@ -1,0 +1,26 @@
+[
+    {
+      "id": 1,
+      "code": "Europalet",
+      "x": 800,
+      "y": 145,
+      "z": 1200,
+      "maxWeight": 1500
+    },
+    {
+      "id": 4,
+      "code": "RACK",
+      "x": 900,
+      "y": 2600,
+      "z": 1300,
+      "maxWeight": 1000
+    },
+    {
+      "id": 7,
+      "code": "Virtual",
+      "x": 0,
+      "y": 0,
+      "z": 0,
+      "maxWeight": "NULL"
+    }
+  ]

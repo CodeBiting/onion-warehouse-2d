@@ -1,0 +1,50 @@
+[
+    {
+      "id": 4,
+      "code": "Aisle"
+    },
+    {
+      "id": 9,
+      "code": "Buffer"
+    },
+    {
+      "id": 7,
+      "code": "Container"
+    },
+    {
+      "id": 8,
+      "code": "Dock"
+    },
+    {
+      "id": 10,
+      "code": "Fabrication line"
+    },
+    {
+      "id": 6,
+      "code": "Location"
+    },
+    {
+      "id": 1,
+      "code": "Organization"
+    },
+    {
+      "id": 12,
+      "code": "Picking"
+    },
+    {
+      "id": 5,
+      "code": "Shelf"
+    },
+    {
+      "id": 11,
+      "code": "Truck"
+    },
+    {
+      "id": 3,
+      "code": "User"
+    },
+    {
+      "id": 2,
+      "code": "Warehouse"
+    }
+  ]

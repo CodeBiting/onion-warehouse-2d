@@ -1,0 +1,50 @@
+[
+    {
+      "id": 2,
+      "code": "system",
+      "typeId": 3,
+      "placeTypeCode": "User",
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "subtypeId": "NULL",
+      "allowStock": 1,
+      "parentId": 1002
+    },
+    {
+      "id": 1000,
+      "code": "boss",
+      "typeId": 3,
+      "placeTypeCode": "User",
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "subtypeId": "NULL",
+      "allowStock": 1,
+      "parentId": 1002
+    },
+    {
+      "id": 1001,
+      "code": "picker1",
+      "typeId": 3,
+      "placeTypeCode": "User",
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "subtypeId": "NULL",
+      "allowStock": 1,
+      "parentId": 1002
+    },
+    {
+      "id": 4458,
+      "code": "picker2",
+      "typeId": 3,
+      "placeTypeCode": "User",
+      "x": 0,
+      "y": 1,
+      "z": 1,
+      "subtypeId": "NULL",
+      "allowStock": 1,
+      "parentId": 1002
+    }
+  ]
