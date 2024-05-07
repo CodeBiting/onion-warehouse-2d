@@ -1,0 +1,286 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        title 2D Map with Pixi.js
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.4/browser/pixi.min.js" integrity="sha512-MLJM72M8frjnFXEvWn3NaVkrSxlDnbRK/Iwyr7loPca+13SdS9B5sNLHoIkDxfPOndP8WReNdwGLxisYUapc7A==" crossorigin="anonymous" referrerpolicy="no-referrer")
+        script(src="https://cdn.jsdelivr.net/npm/pixi-viewport@4.30.0/dist/viewport.min.js")
+        style.
+            #autocomplete-container {
+                position: relative;
+                width: 40%;
+            }
+
+            #buttons {
+                display: flex;
+                justify-content: end;
+                width: 70%;
+                margin-left: 3%;
+            }
+
+            #autocomplete-results {
+                position: absolute;
+                width: 300px;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                border: 1px solid #ddd;
+                background: #fff;
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                max-height: 120px;
+                overflow-y: auto;
+            }
+
+            #autocomplete-results li {
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+
+            #autocomplete-results li:hover {
+                background-color: #f0f0f0;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 10px;
+
+            }
+            canvas {
+                width: 70%;
+            }
+
+            #main-container{
+                display: flex;
+                width: 70%;
+            }
+
+    body
+        h1 Warehouse Map
+        div#main-container
+
+            div#autocomplete-container
+                input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
+                ul#autocomplete-results
+                button(onclick="searchProduct()") Search
+
+            div#buttons
+                button#zoomIn Zoom In
+                button#zoomOut Zoom Out
+
+
+        script.
+            const transformedData = !{JSON.stringify(data)};
+            console.log(transformedData)
+
+            const app = new PIXI.Application({
+                width: 1000,
+                height: 500,
+                backgroundColor: 0xffffff,
+            });
+            document.body.appendChild(app.view);
+
+            app.view.style.border = '4px solid #000000';
+
+            const viewport = new PIXI.Viewport({
+                screenWidth: 1000,
+                screenHeight: 500,
+                worldWidth: 1000,
+                worldHeight: 600,
+                interaction: app.renderer.plugins.interaction
+            });
+
+            app.stage.addChild(viewport);
+
+            viewport.drag().pinch().wheel().decelerate();
+
+            const mapContainer = new PIXI.Container();
+            viewport.addChild(mapContainer);
+
+            function createSquare(x, z, color, highlight = false) {
+                const square = new PIXI.Graphics();
+                square.lineStyle(2, highlight ? 0xffeb3b : 0x000000, 1);
+                if (!highlight) {
+                    square.beginFill(color);
+                }
+                square.drawRect(0, 0, 25, 25);
+                if (!highlight) {
+                    square.endFill();
+                }
+                square.x = x * 25;
+                square.y = z * 25;
+
+                return square;
+            }
+
+            function createTiles() {
+                // Locations
+                transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
+                    console.log('Locations Group:', locationGroup);
+                    locationGroup.locations.forEach((location) => {
+                        const color = 0x0000ff;
+                        const square = createSquare(location.x, location.z, color);
+                        mapContainer.addChild(square);
+                    });
+                });
+
+                // Users
+                const users = transformedData.filter(item => item.placeTypeCode === "User");
+                console.log('Users:', users);
+                users.forEach((user) => {
+                    const color = 0x00ff00;
+                    const square = createSquare(user.x, user.z, color);
+                    mapContainer.addChild(square);
+                });
+
+                // Docks
+                transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
+                    const color = 0xff0000;
+                    const square = createSquare(dock.x, dock.z, color);
+                    mapContainer.addChild(square);
+                });
+
+                // Buffer
+                transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
+                    const color = 0xff8000;
+                    const square = createSquare(buffer.x, buffer.z, color);
+
+                    mapContainer.addChild(square);
+                });
+            }
+
+            window.searchProduct = function () {
+                const productCode = document.getElementById('productCode').value.trim().toUpperCase().replace(/\s/g, '');
+
+                let locations = [];
+                let users = [];
+                let docks = [];
+                let buffers = [];
+                transformedData.forEach(item => {
+                    if (Array.isArray(item.locations) && item.locations.length > 0) {
+                        const foundLocation = item.locations.find(location => {
+                            if (location && location.code) {
+                                const cleanedCode = location.code.trim().toUpperCase().replace(/\s/g, '');
+                                return cleanedCode === productCode;
+                            }
+                            return false;
+                        });
+                        if (foundLocation) {
+                            locations.push(foundLocation);
+                        }
+                    }
+
+                    if (item && item.code) {
+                        const cleanedItemCode = item.code.trim().toUpperCase().replace(/\s/g, '');
+                        if (cleanedItemCode === productCode) {
+                            if (item.placeTypeCode === 'User') {
+                                users.push(item);
+                            } else if (item.placeTypeCode === 'Dock') {
+                                docks.push(item);
+                            } else if (item.placeTypeCode === 'Buffer') {
+                                buffers.push(item);
+                            }
+                        }
+                    }
+                });
+
+                if (locations.length > 0 || users.length > 0 || docks.length > 0 || buffers.length > 0) {
+                    console.log(`Product found: ${productCode}. It will be highlighted`);
+                    locations.forEach(location => {
+                        const square = createSquare(location.x, location.z, 0xffffff, true);
+                        mapContainer.addChild(square);
+                        viewport.moveCenter(location.x * 25 + 12.5, location.z * 25 + 12.5);
+
+                    });
+                    users.forEach(user => highlightItem(user.x, user.z));
+                    docks.forEach(dock => highlightItem(dock.x, dock.z));
+                    buffers.forEach(buffer => highlightItem(buffer.x, buffer.z));
+                } else {
+                    console.log(`Product not found: ${productCode}.`);
+                }
+            };
+
+
+            let productCodes = [];
+
+            transformedData.forEach(item => {
+                if (item.code) {
+                    productCodes.push(item.code);
+                }
+                if (Array.isArray(item.locations)) {
+                    item.locations.forEach(location => {
+                        if (location.code) {
+                            productCodes.push(location.code);
+                        }
+                    });
+                }
+            });
+            console.log(productCodes)
+
+            window.autocompleteSearch = function () {
+                let input = document.getElementById('productCode');
+                let filter = input.value.toUpperCase();
+                let ul = document.getElementById('autocomplete-results');
+                ul.innerHTML = '';
+
+                let suggestions = transformedData
+                    .filter(item => item.code && item.code.toUpperCase().startsWith(filter))
+                    .map(item => item.code);
+
+                transformedData.forEach(item => {
+                    if (Array.isArray(item.locations)) {
+                        item.locations.forEach(location => {
+                            if (location.code && location.code.toUpperCase().startsWith(filter)) {
+                                suggestions.push(location.code);
+                            }
+                        });
+                    }
+                });
+
+                suggestions = suggestions.slice(0, 4);
+
+                suggestions.forEach(suggestion => {
+                    let li = document.createElement('li');
+                    li.textContent = suggestion;
+                    li.onclick = function () {
+                        input.value = suggestion;
+                        ul.innerHTML = '';
+                        searchProduct();
+                    };
+                    ul.appendChild(li);
+                });
+            };
+
+            function highlightItem(x, z) {
+                const highlightColor = 0xffeb3b;
+                const square = createSquare(x, z, highlightColor, true);
+                mapContainer.addChild(square);
+                viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
+            }
+
+
+            document.addEventListener('click', function (event) {
+                const autocompleteList = document.getElementById('autocomplete-results');
+                if (!event.target.matches('#productCode')) {
+                    autocompleteList.innerHTML = '';
+                }
+            });
+
+            createTiles();
+
+            const zoomInButton = document.getElementById('zoomIn');
+            const zoomOutButton = document.getElementById('zoomOut');
+
+            zoomInButton.addEventListener('click', () => {
+                viewport.zoomPercent(0.1);
+                console.log('Zoom In clicked');
+            });
+
+            zoomOutButton.addEventListener('click', () => {
+                viewport.zoomPercent(-0.1);
+                console.log('Zoom Out clicked');
+            });
