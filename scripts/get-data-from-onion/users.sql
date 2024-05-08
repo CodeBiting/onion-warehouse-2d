@@ -30,10 +30,11 @@ select p.id, p2.code, p.weight
 from place p inner join place p2 on p2.parentId = p.id
 where p.typeId = 3;
 
--- Tasks in a user
+-- Tasks and orders attached to a user
 SELECT p.id, o.code, count(1) as taskmovements
 FROM place p inner join `user` u on p.id = u.placeId
-             inner join cbwmskaribou.taskmovement tm on tm.userId = u.id
+             inner join taskmovement tm on tm.userId = u.id
+             inner join taskuser tu on tm.pathNumber = tu.pathNumber
              left join `order` o on tm.orderId = o.id
 WHERE p.typeId = 3
 GROUP BY p.id, tm.userId, o.code;
