@@ -13,7 +13,7 @@ html(lang="en")
 
             #buttons {
                 display: flex;
-                justify-content: end;
+                justify-content: flex-end;
                 width: 70%;
                 margin-left: 3%;
             }
@@ -42,47 +42,112 @@ html(lang="en")
             #autocomplete-results li:hover {
                 background-color: #f0f0f0;
             }
+
             body {
                 display: flex;
                 flex-direction: column;
-                justify-content: center;
-                align-items: center;
                 gap: 10px;
-
             }
+
             canvas {
-                width: 70%;
+                width: 69%;
             }
 
-            #main-container{
+            #product-interaction-section {
                 display: flex;
-                width: 70%;
+                align-items: center;
+                width: 68%;
             }
+
+            #location-details {
+                width: 29%;
+                max-height: 500px;
+                overflow-y: auto;
+                border: 3px solid #ccc;
+                padding: 10px;
+
+            }
+            #location-details table{
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            #location-details th, #location-details td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            #location-details tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+            #location-details th {
+                background-color: #4CAF50;
+                color: white;
+            }
+            #pixi-canvas-container {
+                display: flex;
+                flex-direction: column-reverse;
+                gap: 5%;
+            }
+            #title{
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            #titleInfo{
+                display: flex;
+                justify-content: center;
+                width: 32%;
+            }
+            #location-details-section{
+                display: flex;
+                height: auto;
+            }
+
 
     body
-        h1 Warehouse Map
-        div#main-container
+        #title
+            h1 Warehouse Map
+        #location-details-section
+            #product-interaction-section
+                #autocomplete-container
+                    input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
+                    ul#autocomplete-results
+                    button(onclick="searchProduct()") Search
 
-            div#autocomplete-container
-                input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
-                ul#autocomplete-results
-                button(onclick="searchProduct()") Search
+                #buttons
+                    button#zoomIn Zoom In
+                    button#zoomOut Zoom Out
 
-            div#buttons
-                button#zoomIn Zoom In
-                button#zoomOut Zoom Out
 
+        #pixi-canvas-container
+            #location-details
+                table
+                    thead
+                        tr
+                            th Location Code
+                            th Parent Code
+                            th Position
+                            th Inside
+                    tbody
+            #titleInfo
+                h2 Details
 
         script.
             const transformedData = !{JSON.stringify(data)};
-            console.log(transformedData)
+            const products = !{JSON.stringify(productsData)};
+            const stocks = !{JSON.stringify(stocksData)};
+            console.log(transformedData);
 
             const app = new PIXI.Application({
                 width: 1000,
                 height: 500,
                 backgroundColor: 0xffffff,
             });
-            document.body.appendChild(app.view);
+            const canvasContainer = document.getElementById('pixi-canvas-container');
+            canvasContainer.appendChild(app.view);
 
             app.view.style.border = '4px solid #000000';
 
@@ -101,29 +166,42 @@ html(lang="en")
             const mapContainer = new PIXI.Container();
             viewport.addChild(mapContainer);
 
-            function createSquare(x, z, color, highlight = false) {
-                const square = new PIXI.Graphics();
-                square.lineStyle(2, highlight ? 0xffeb3b : 0x000000, 1);
-                if (!highlight) {
-                    square.beginFill(color);
-                }
-                square.drawRect(0, 0, 25, 25);
-                if (!highlight) {
-                    square.endFill();
-                }
+            function createSquare (x, z, highlight = false, color = 0xffffff) {
+                const square = new PIXI.Container();
                 square.x = x * 25;
                 square.y = z * 25;
+                square.interactive = true; // Make it interactive
+                square.on('pointerdown', () => displayInfo(x, z)); // Add event listener
+
+                if (color !== 0xffffff) {
+                    const graphics = new PIXI.Graphics();
+                    graphics.beginFill(color, 1);
+                    graphics.drawRect(0, 0, 25, 25);
+                    graphics.endFill();
+                    square.addChild(graphics);
+                }
+
+                if (highlight) {
+                    const highlightOverlay = new PIXI.Graphics();
+                    highlightOverlay.beginFill(0xffeb3b, 0.5);
+                    highlightOverlay.drawRect(0, 0, 25, 25);
+                    highlightOverlay.endFill();
+                    square.addChild(highlightOverlay);
+                } else {
+                    const image = new PIXI.Sprite.from('/images/thumbnail_icona-estanteria-2.png');
+                    image.width = 25;
+                    image.height = 25;
+                    square.addChild(image);
+                }
 
                 return square;
             }
 
-            function createTiles() {
+            function createTiles () {
                 // Locations
                 transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
-                    console.log('Locations Group:', locationGroup);
                     locationGroup.locations.forEach((location) => {
-                        const color = 0x0000ff;
-                        const square = createSquare(location.x, location.z, color);
+                        const square = createSquare(location.x, location.z, false, 0xffffff);
                         mapContainer.addChild(square);
                     });
                 });
@@ -133,93 +211,211 @@ html(lang="en")
                 console.log('Users:', users);
                 users.forEach((user) => {
                     const color = 0x00ff00;
-                    const square = createSquare(user.x, user.z, color);
+                    const square = createSquare(user.x, user.z, "user", color);
                     mapContainer.addChild(square);
                 });
 
                 // Docks
                 transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
                     const color = 0xff0000;
-                    const square = createSquare(dock.x, dock.z, color);
+                    const square = createSquare(dock.x, dock.z, "dock", color);
                     mapContainer.addChild(square);
                 });
 
                 // Buffer
                 transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
                     const color = 0xff8000;
-                    const square = createSquare(buffer.x, buffer.z, color);
-
+                    const square = createSquare(buffer.x, buffer.z, "buffer", color);
                     mapContainer.addChild(square);
                 });
             }
 
-            window.searchProduct = function () {
-                const productCode = document.getElementById('productCode').value.trim().toUpperCase().replace(/\s/g, '');
+            function isUser (x, z) {
+                for (const item of transformedData) {
+                    if (item.placeTypeCode === "User" && item.x === x && item.z === z) {
+                        return true;
+                    }
+                }
 
-                let locations = [];
-                let users = [];
-                let docks = [];
-                let buffers = [];
-                transformedData.forEach(item => {
-                    if (Array.isArray(item.locations) && item.locations.length > 0) {
-                        const foundLocation = item.locations.find(location => {
-                            if (location && location.code) {
-                                const cleanedCode = location.code.trim().toUpperCase().replace(/\s/g, '');
-                                return cleanedCode === productCode;
-                            }
-                            return false;
-                        });
-                        if (foundLocation) {
-                            locations.push(foundLocation);
+                return false;
+            }
+            function isLocation (x, z) {
+                for (const item of transformedData) {
+                    if (Array.isArray(item.locations)) {
+                        if (item.locations.some(location => location.x === x && location.z === z)) {
+                            return true;
                         }
                     }
+                }
+                return false;
+            }
 
-                    if (item && item.code) {
-                        const cleanedItemCode = item.code.trim().toUpperCase().replace(/\s/g, '');
-                        if (cleanedItemCode === productCode) {
-                            if (item.placeTypeCode === 'User') {
-                                users.push(item);
-                            } else if (item.placeTypeCode === 'Dock') {
-                                docks.push(item);
-                            } else if (item.placeTypeCode === 'Buffer') {
-                                buffers.push(item);
+            function isBuffer (x, z) {
+                for (const item of transformedData) {
+                    if (item.placeTypeCode === "Buffer" && item.x === x && item.z === z) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            function isDock (x, z) {
+
+                for (const item of transformedData) {
+                    if (item.placeTypeCode === "Dock" && item.x === x && item.z === z) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function displayInfo (x, z) {
+                const isUserSquare = isUser(x, z);
+                const isLocationSquare = isLocation(x, z);
+
+                switch (true) {
+                    case isUserSquare:
+                        elementType = "User";
+                        displayUserInfo();
+                        break;
+                    case isLocationSquare:
+                        elementType = "Location";
+                        displayLocationInfo(x, z);
+                        break;
+                    default:
+                        console.log("No information available for this square");
+                        return;
+                }
+
+                const titleInfo = document.getElementById('titleInfo');
+                titleInfo.querySelector('h2').textContent = `${elementType} Details`;
+            }
+
+            function displayUserInfo () {
+                console.log("You are calling this function")
+            }
+
+            function displayLocationInfo (x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.innerHTML = '';
+
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const tbody = document.createElement('tbody');
+                const trHead = document.createElement('tr');
+
+                const thLocationCode = document.createElement('th');
+                thLocationCode.textContent = 'Location Code';
+                const thParentCode = document.createElement('th');
+                thParentCode.textContent = 'Parent Code';
+                const thPosition = document.createElement('th');
+                thPosition.textContent = 'Position';
+                const thInside = document.createElement('th');
+                thInside.textContent = 'Inside';
+
+                trHead.appendChild(thLocationCode);
+                trHead.appendChild(thParentCode);
+                trHead.appendChild(thPosition);
+                trHead.appendChild(thInside);
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                transformedData.forEach(item => {
+                    if (Array.isArray(item.locations)) {
+                        item.locations.forEach(location => {
+                            if (location.x === x && location.z === z) {
+                                const trBody = document.createElement('tr');
+
+                                const tdLocationCode = document.createElement('td');
+                                tdLocationCode.textContent = location.code;
+                                const tdParentCode = document.createElement('td');
+                                const regex = /^[A-Za-z]\s*\d{6}$/;
+                                const isStandardFormat = regex.test(location.code.replace(/\s/g, ''));
+                                tdParentCode.textContent = isStandardFormat ? location.code.trim().charAt(0) : location.code;
+
+                                const tdPosition = document.createElement('td');
+                                tdPosition.textContent = `| x = ${location.x} | y = ${location.y || 0} | z = ${location.z} |`;
+
+                                const tdInside = document.createElement('td');
+                                const locationStocks = stocks.filter(stock => stock.placeId === location.id);
+                                if (locationStocks.length > 0) {
+                                    locationStocks.forEach(stock => {
+                                        const product = products.find(product => product.id === stock.productId);
+                                        if (product) {
+                                            const productInfo = document.createElement('div');
+                                            productInfo.textContent = `${product.name} = ${stock.quantity} Units`;
+                                            tdInside.appendChild(productInfo);
+                                        }
+                                    });
+                                } else {
+                                    tdInside.textContent = 'No products found.';
+                                }
+
+                                trBody.appendChild(tdLocationCode);
+                                trBody.appendChild(tdParentCode);
+                                trBody.appendChild(tdPosition);
+                                trBody.appendChild(tdInside);
+                                tbody.appendChild(trBody);
                             }
-                        }
+                        });
                     }
                 });
 
-                if (locations.length > 0 || users.length > 0 || docks.length > 0 || buffers.length > 0) {
-                    console.log(`Product found: ${productCode}. It will be highlighted`);
-                    locations.forEach(location => {
-                        const square = createSquare(location.x, location.z, 0xffffff, true);
-                        mapContainer.addChild(square);
-                        viewport.moveCenter(location.x * 25 + 12.5, location.z * 25 + 12.5);
+                locationDetails.appendChild(table);
+            }
 
-                    });
-                    users.forEach(user => highlightItem(user.x, user.z));
-                    docks.forEach(dock => highlightItem(dock.x, dock.z));
-                    buffers.forEach(buffer => highlightItem(buffer.x, buffer.z));
-                } else {
-                    console.log(`Product not found: ${productCode}.`);
+            function findStockByProductId (productId) {
+                return stocks.find(stock => stock.productId === productId);
+            }
+
+            window.searchProduct = function () {
+                const productCode = document.getElementById('productCode').value.trim().toUpperCase();
+
+                let found = false;
+
+                const product = products.find(product => product.code.toUpperCase() === productCode);
+                if (product) {
+                    found = true;
+                    const stock = findStockByProductId(product.id);
+                    if (stock) {
+                        const location = transformedData.find(item => item.locations && item.locations.some(location => location.id === stock.placeId && location.placeTypeCode === 'Location'));
+                        if (location) {
+                            console.log(`Product found: ${productCode}. It will be highlighted`);
+                            highlightItem(location.x, location.z);
+                        } else {
+                            console.log(`Location not found for product: ${productCode}.`);
+                        }
+                    } else {
+                        console.log(`No stock found for product: ${productCode}.`);
+                    }
                 }
-            };
 
-
-            let productCodes = [];
-
-            transformedData.forEach(item => {
-                if (item.code) {
-                    productCodes.push(item.code);
-                }
-                if (Array.isArray(item.locations)) {
-                    item.locations.forEach(location => {
-                        if (location.code) {
-                            productCodes.push(location.code);
+                if (!found) {
+                    transformedData.forEach(item => {
+                        if (item.code && item.code.toUpperCase() === productCode) {
+                            found = true;
+                            if (item.placeTypeCode === 'User' || item.placeTypeCode === 'Dock' || item.placeTypeCode === 'Buffer') {
+                                console.log(`${productCode}. It will be highlighted`);
+                                highlightItem(item.x, item.z);
+                            }
+                        } else if (item.locations) {
+                            item.locations.forEach(location => {
+                                if (location.code && location.code.toUpperCase() === productCode) {
+                                    found = true;
+                                    console.log(`Location found: ${productCode}. It will be highlighted`);
+                                    highlightItem(location.x, location.z);
+                                }
+                            });
                         }
                     });
                 }
-            });
-            console.log(productCodes)
+
+                if (!found) {
+                    console.log(`Product not found: ${productCode}.`);
+                }
+            };
 
             window.autocompleteSearch = function () {
                 let input = document.getElementById('productCode');
@@ -227,11 +423,18 @@ html(lang="en")
                 let ul = document.getElementById('autocomplete-results');
                 ul.innerHTML = '';
 
-                let suggestions = transformedData
-                    .filter(item => item.code && item.code.toUpperCase().startsWith(filter))
-                    .map(item => item.code);
+                let suggestions = [];
+
+                products.forEach(product => {
+                    if (product.code.toUpperCase().startsWith(filter)) {
+                        suggestions.push(product.code);
+                    }
+                });
 
                 transformedData.forEach(item => {
+                    if (item.code && item.code.toUpperCase().startsWith(filter)) {
+                        suggestions.push(item.code);
+                    }
                     if (Array.isArray(item.locations)) {
                         item.locations.forEach(location => {
                             if (location.code && location.code.toUpperCase().startsWith(filter)) {
@@ -255,13 +458,12 @@ html(lang="en")
                 });
             };
 
-            function highlightItem(x, z) {
+            function highlightItem (x, z) {
                 const highlightColor = 0xffeb3b;
                 const square = createSquare(x, z, highlightColor, true);
                 mapContainer.addChild(square);
                 viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
             }
-
 
             document.addEventListener('click', function (event) {
                 const autocompleteList = document.getElementById('autocomplete-results');
@@ -284,3 +486,4 @@ html(lang="en")
                 viewport.zoomPercent(-0.1);
                 console.log('Zoom Out clicked');
             });
+
