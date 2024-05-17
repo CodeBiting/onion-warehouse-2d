@@ -4,10 +4,12 @@ const { jsonConvert } = require('../api/jsonTrasnformer');
 // const warehouse = require('../test/data/groupLocations.json');
 const warehouse = require('../data/warehouse.json');
 const users = require('../data/users.json');
+const productsData = require('../data/products.json');
+const stocksData = require('../data/stocks.json');
 
 router.get('/', function (req, res, next) {
     const transformedData = jsonConvert('WH', warehouse, users);
-    res.render('warehouseMap', { data: transformedData });
+    res.render('warehouseMap', { data: transformedData, productsData: productsData, stocksData: stocksData });
 });
 
 module.exports = router;
