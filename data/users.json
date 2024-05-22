@@ -2,49 +2,105 @@
     {
       "id": 2,
       "code": "system",
+      "name": "",
+      "surname": "",
       "typeId": 3,
       "placeTypeCode": "User",
-      "x": 0,
+      "x": 1,
       "y": 1,
-      "z": 1,
+      "z": 2,
       "subtypeId": "NULL",
       "allowStock": 1,
-      "parentId": 1002
+      "parentId": 1002,
+      "carriedPlaces": [],
+      "carriedStocks": [],
+      "orders": []
     },
     {
       "id": 1000,
       "code": "boss",
+      "name": "Bruce",
+      "surname": "Springsteen",
       "typeId": 3,
       "placeTypeCode": "User",
-      "x": 0,
+      "x": 1,
       "y": 1,
-      "z": 1,
+      "z": 10,
       "subtypeId": "NULL",
       "allowStock": 1,
-      "parentId": 1002
+      "parentId": 1002,
+      "carriedPlaces": [],
+      "carriedStocks": [],
+      "orders": []
     },
     {
       "id": 1001,
       "code": "picker1",
+      "name": "John",
+      "surname": "Smith",
       "typeId": 3,
       "placeTypeCode": "User",
-      "x": 0,
+      "x": 2,
       "y": 1,
-      "z": 1,
+      "z": 13,
       "subtypeId": "NULL",
       "allowStock": 1,
-      "parentId": 1002
+      "parentId": 1002,
+      "carriedPlaces": [
+        {
+          "id": 1001,
+          "code": "000000000000000001",
+          "weight": 20
+        }
+      ],
+      "carriedStocks": [
+        {
+          "id": 1001,
+          "code": "9786678",
+          "quantity": 10
+        }
+      ],
+      "orders": [
+        {
+          "id": 1001,
+          "code": "PV34-01620",
+          "taskmovements": 8
+        }
+      ]
     },
     {
       "id": 4458,
       "code": "picker2",
+      "name": "Peter",
+      "surname": "Parker",
       "typeId": 3,
       "placeTypeCode": "User",
-      "x": 0,
+      "x": 5,
       "y": 1,
-      "z": 1,
+      "z": 7,
       "subtypeId": "NULL",
       "allowStock": 1,
-      "parentId": 1002
+      "parentId": 1002,
+      "carriedPlaces": [
+        {
+          "id": 4458,
+          "code": "000000000000000002",
+          "weight": 20
+        }
+      ],
+      "carriedStocks": [
+        {
+          "id": 4458,
+          "code": "9786678",
+          "quantity": 20
+        }
+      ],
+      "orders": [
+        {
+          "id": 4458,
+          "code": "PV34-00123",
+          "taskmovements": 3
+        }
+      ]
     }
   ]

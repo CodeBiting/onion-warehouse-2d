@@ -1,0 +1,50 @@
+[
+    {
+        "createdAt": "2023-09-26T15:55:42.223Z",
+        "updatedAt": "2024-02-13T11:18:50.419Z",
+        "id": 1000,
+        "placeId": 1138,
+        "productId": 1,
+        "quantity": 100,
+        "orderLineId": null,
+        "reservedOrderLineId": null,
+        "weight": null,
+        "calcWeight": null,
+        "receivedAt": "2023-09-26T15:55:42.223Z",
+        "accountId": null,
+        "countedAt": "2024-02-13T11:18:50.314Z",
+        "fromReceptionCode": null
+    },
+    {
+        "createdAt": "2023-09-26T15:55:42.223Z",
+        "updatedAt": "2024-02-13T11:18:50.419Z",
+        "id": 1001,
+        "placeId": 1139,
+        "productId": 2,
+        "quantity": 100,
+        "orderLineId": null,
+        "reservedOrderLineId": null,
+        "weight": null,
+        "calcWeight": null,
+        "receivedAt": "2023-09-26T15:55:42.223Z",
+        "accountId": null,
+        "countedAt": "2024-02-13T11:18:50.314Z",
+        "fromReceptionCode": null
+    },
+    {
+        "createdAt": "2023-09-26T15:55:42.223Z",
+        "updatedAt": "2024-02-13T11:18:50.419Z",
+        "id": 1002,
+        "placeId": 1140,
+        "productId": 3,
+        "quantity": 100,
+        "orderLineId": null,
+        "reservedOrderLineId": null,
+        "weight": null,
+        "calcWeight": null,
+        "receivedAt": "2023-09-26T15:55:42.223Z",
+        "accountId": null,
+        "countedAt": "2024-02-13T11:18:50.314Z",
+        "fromReceptionCode": null
+    }
+]

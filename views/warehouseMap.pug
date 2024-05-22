@@ -1,0 +1,584 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        title 2D Map with Pixi.js
+        script(src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.4/browser/pixi.min.js" integrity="sha512-MLJM72M8frjnFXEvWn3NaVkrSxlDnbRK/Iwyr7loPca+13SdS9B5sNLHoIkDxfPOndP8WReNdwGLxisYUapc7A==" crossorigin="anonymous" referrerpolicy="no-referrer")
+        script(src="https://cdn.jsdelivr.net/npm/pixi-viewport@4.30.0/dist/viewport.min.js")
+        style.
+            #autocomplete-container {
+                position: relative;
+                width: 40%;
+            }
+
+            #buttons {
+                display: flex;
+                justify-content: flex-end;
+                width: 70%;
+                margin-left: 3%;
+            }
+
+            #autocomplete-results {
+                position: absolute;
+                width: 300px;
+                top: 100%;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                border: 1px solid #ddd;
+                background: #fff;
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+                max-height: 120px;
+                overflow-y: auto;
+            }
+
+            #autocomplete-results li {
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+
+            #autocomplete-results li:hover {
+                background-color: #f0f0f0;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            canvas {
+                width: 69%;
+            }
+
+            #product-interaction-section {
+                display: flex;
+                align-items: center;
+                width: 68%;
+            }
+
+            #location-details {
+                width: 29%;
+                max-height: 500px;
+                overflow-y: auto;
+                border: 3px solid #ccc;
+                padding: 10px;
+
+            }
+            #location-details table{
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            #location-details th, #location-details td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+
+            #location-details tr:nth-child(even) {
+                background-color: #f2f2f2;
+            }
+            #location-details th {
+                background-color: #4CAF50;
+                color: white;
+            }
+            #pixi-canvas-container {
+                display: flex;
+                flex-direction: column-reverse;
+                gap: 5%;
+            }
+            #title{
+                display: flex;
+                justify-content: center;
+                margin-bottom: 20px;
+            }
+
+            #titleInfo{
+                display: flex;
+                justify-content: center;
+                width: 32%;
+            }
+            #location-details-section{
+                display: flex;
+                height: auto;
+            }
+
+
+    body
+        #title
+            h1 Warehouse Map
+        #location-details-section
+            #product-interaction-section
+                #autocomplete-container
+                    input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
+                    ul#autocomplete-results
+                    button(onclick="searchProduct()") Search
+
+                #buttons
+                    button#zoomIn Zoom In
+                    button#zoomOut Zoom Out
+
+
+        #pixi-canvas-container
+            #location-details
+                table
+                    thead
+                        tr
+                            th Location Code
+                            th Parent Code
+                            th Position
+                            th Inside
+                    tbody
+            #titleInfo
+                h2 Details
+
+        script.
+            const transformedData = !{JSON.stringify(data)};
+            const products = !{JSON.stringify(productsData)};
+            const stocks = !{JSON.stringify(stocksData)};
+            console.log(transformedData);
+
+            const app = new PIXI.Application({
+                width: 1000,
+                height: 500,
+                backgroundColor: 0xffffff,
+            });
+            const canvasContainer = document.getElementById('pixi-canvas-container');
+            canvasContainer.appendChild(app.view);
+
+            app.view.style.border = '4px solid #000000';
+
+            const viewport = new PIXI.Viewport({
+                screenWidth: 1000,
+                screenHeight: 500,
+                worldWidth: 1000,
+                worldHeight: 600,
+                interaction: app.renderer.plugins.interaction
+            });
+
+            app.stage.addChild(viewport);
+
+            viewport.drag().pinch().wheel().decelerate();
+
+            const mapContainer = new PIXI.Container();
+            viewport.addChild(mapContainer);
+
+            function createSquare (x, z, highlight = false, color = 0xffffff) {
+                const square = new PIXI.Container();
+                square.x = x * 25;
+                square.y = z * 25;
+                square.interactive = true; // Make it interactive
+                square.on('pointerdown', () => displayInfo(x, z)); // Add event listener
+
+                if (color !== 0xffffff) {
+                    const graphics = new PIXI.Graphics();
+                    graphics.beginFill(color, 1);
+                    graphics.drawRect(0, 0, 25, 25);
+                    graphics.endFill();
+                    square.addChild(graphics);
+                }
+
+                if (highlight) {
+                    const highlightOverlay = new PIXI.Graphics();
+                    highlightOverlay.beginFill(0xffeb3b, 0.5);
+                    highlightOverlay.drawRect(0, 0, 25, 25);
+                    highlightOverlay.endFill();
+                    square.addChild(highlightOverlay);
+                } else {
+                    const image = new PIXI.Sprite.from('/images/thumbnail_icona-estanteria-2.png');
+                    image.width = 25;
+                    image.height = 25;
+                    square.addChild(image);
+                }
+
+                return square;
+            }
+
+            function createTiles () {
+                // Locations
+                transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
+                    locationGroup.locations.forEach((location) => {
+                        const square = createSquare(location.x, location.z, false, 0xffffff);
+                        mapContainer.addChild(square);
+                    });
+                });
+
+                // Users
+                const users = transformedData.filter(item => item.placeTypeCode === "User");
+                console.log('Users:', users);
+                users.forEach((user) => {
+                    const color = 0x00ff00;
+                    const square = createSquare(user.x, user.z, "user", color);
+                    mapContainer.addChild(square);
+                });
+
+                // Docks
+                transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
+                    const color = 0xff0000;
+                    const square = createSquare(dock.x, dock.z, "dock", color);
+                    mapContainer.addChild(square);
+                });
+
+                // Buffer
+                transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
+                    const color = 0xff8000;
+                    const square = createSquare(buffer.x, buffer.z, "buffer", color);
+                    mapContainer.addChild(square);
+                });
+            }
+
+            function isUser (x, z) {
+                for (const item of transformedData) {
+                    if (item.placeTypeCode === "User" && item.x === x && item.z === z) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+            function isLocation (x, z) {
+                for (const item of transformedData) {
+                    if (Array.isArray(item.locations)) {
+                        if (item.locations.some(location => location.x === x && location.z === z)) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            }
+
+            function isBuffer (x, z) {
+                for (const item of transformedData) {
+                    if (item.placeTypeCode === "Buffer" && item.x === x && item.z === z) {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
+
+            function isDock (x, z) {
+
+                for (const item of transformedData) {
+                    if (item.placeTypeCode === "Dock" && item.x === x && item.z === z) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            function displayInfo (x, z) {
+                const isUserSquare = isUser(x, z);
+                const isLocationSquare = isLocation(x, z);
+
+                switch (true) {
+                    case isUserSquare:
+                        elementType = "User";
+                        displayUserInfo(x, z);
+                        break;
+                    case isLocationSquare:
+                        elementType = "Location";
+                        displayLocationInfo(x, z);
+                        break;
+                    default:
+                        console.log("No information available for this square");
+                        return;
+                }
+
+                const titleInfo = document.getElementById('titleInfo');
+                titleInfo.querySelector('h2').textContent = `${elementType} Details`;
+            }
+
+            function displayUserInfo (x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.innerHTML = '';
+
+                const user = transformedData.find(item => item.placeTypeCode === "User" && item.x === x && item.z === z);
+
+                if (user) {
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    const trHead = document.createElement('tr');
+
+                    const thId = document.createElement('th');
+                    thId.textContent = 'User ID';
+                    const thCode = document.createElement('th');
+                    thCode.textContent = 'Code';
+                    const thName = document.createElement('th');
+                    thName.textContent = 'Name';
+                    const thSurname = document.createElement('th');
+                    thSurname.textContent = 'Surname';
+                    const thPosition = document.createElement('th');
+                    thPosition.textContent = 'Position';
+
+                    trHead.appendChild(thId);
+                    trHead.appendChild(thCode);
+                    trHead.appendChild(thName);
+                    trHead.appendChild(thSurname);
+                    trHead.appendChild(thPosition);
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    const trBody = document.createElement('tr');
+
+                    const tdId = document.createElement('td');
+                    tdId.textContent = user.id;
+                    const tdCode = document.createElement('td');
+                    tdCode.textContent = user.code;
+                    const tdName = document.createElement('td');
+                    tdName.textContent = user.name || 'N/A';
+                    const tdSurname = document.createElement('td');
+                    tdSurname.textContent = user.surname || 'N/A';
+                    const tdPosition = document.createElement('td');
+                    tdPosition.textContent = `| x = ${user.x} | y = ${user.y || 0} | z = ${user.z} |`;
+
+                    trBody.appendChild(tdId);
+                    trBody.appendChild(tdCode);
+                    trBody.appendChild(tdName);
+                    trBody.appendChild(tdSurname);
+                    trBody.appendChild(tdPosition);
+                    tbody.appendChild(trBody);
+
+                    // Carried Places
+                    if (user.carriedPlaces && user.carriedPlaces.length > 0) {
+                        const carriedPlacesHeader = document.createElement('tr');
+                        carriedPlacesHeader.innerHTML = `<th colspan="5">Carried Places</th>`;
+                        tbody.appendChild(carriedPlacesHeader);
+
+                        user.carriedPlaces.forEach(place => {
+                            const trPlace = document.createElement('tr');
+                            trPlace.innerHTML = `<td colspan="2">Code: ${place.code}</td><td colspan="3">Weight: ${place.weight}</td>`;
+                            tbody.appendChild(trPlace);
+                        });
+                    }
+
+                    // Carried Stocks
+                    if (user.carriedStocks && user.carriedStocks.length > 0) {
+                        const carriedStocksHeader = document.createElement('tr');
+                        carriedStocksHeader.innerHTML = `<th colspan="5">Carried Stocks</th>`;
+                        tbody.appendChild(carriedStocksHeader);
+
+                        user.carriedStocks.forEach(stock => {
+                            const trStock = document.createElement('tr');
+                            trStock.innerHTML = `<td colspan="2">Code: ${stock.code}</td><td colspan="3">Quantity: ${stock.quantity}</td>`;
+                            tbody.appendChild(trStock);
+                        });
+                    }
+
+                    // Orders
+                    if (user.orders && user.orders.length > 0) {
+                        const ordersHeader = document.createElement('tr');
+                        ordersHeader.innerHTML = `<th colspan="5">Orders</th>`;
+                        tbody.appendChild(ordersHeader);
+
+                        user.orders.forEach(order => {
+                            const trOrder = document.createElement('tr');
+                            trOrder.innerHTML = `<td colspan="2">Code: ${order.code}</td><td colspan="3">Task Movements: ${order.taskmovements}</td>`;
+                            tbody.appendChild(trOrder);
+                        });
+                    }
+
+                    locationDetails.appendChild(table);
+                } else {
+                    console.log("User not found.");
+                }
+            }
+
+            function displayLocationInfo (x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.innerHTML = '';
+
+                const table = document.createElement('table');
+                const thead = document.createElement('thead');
+                const tbody = document.createElement('tbody');
+                const trHead = document.createElement('tr');
+
+                const thLocationCode = document.createElement('th');
+                thLocationCode.textContent = 'Location Code';
+                const thParentCode = document.createElement('th');
+                thParentCode.textContent = 'Parent Code';
+                const thPosition = document.createElement('th');
+                thPosition.textContent = 'Position';
+                const thInside = document.createElement('th');
+                thInside.textContent = 'Inside';
+
+                trHead.appendChild(thLocationCode);
+                trHead.appendChild(thParentCode);
+                trHead.appendChild(thPosition);
+                trHead.appendChild(thInside);
+                thead.appendChild(trHead);
+                table.appendChild(thead);
+                table.appendChild(tbody);
+
+                transformedData.forEach(item => {
+                    if (Array.isArray(item.locations)) {
+                        item.locations.forEach(location => {
+                            if (location.x === x && location.z === z) {
+                                const trBody = document.createElement('tr');
+
+                                const tdLocationCode = document.createElement('td');
+                                tdLocationCode.textContent = location.code;
+                                const tdParentCode = document.createElement('td');
+                                const regex = /^[A-Za-z]\s*\d{6}$/;
+                                const isStandardFormat = regex.test(location.code.replace(/\s/g, ''));
+                                tdParentCode.textContent = isStandardFormat ? location.code.trim().charAt(0) : location.code;
+
+                                const tdPosition = document.createElement('td');
+                                tdPosition.textContent = `| x = ${location.x} | y = ${location.y || 0} | z = ${location.z} |`;
+
+                                const tdInside = document.createElement('td');
+                                const locationStocks = stocks.filter(stock => stock.placeId === location.id);
+                                if (locationStocks.length > 0) {
+                                    locationStocks.forEach(stock => {
+                                        const product = products.find(product => product.id === stock.productId);
+                                        if (product) {
+                                            const productInfo = document.createElement('div');
+                                            productInfo.textContent = `${product.name} = ${stock.quantity} Units`;
+                                            tdInside.appendChild(productInfo);
+                                        }
+                                    });
+                                } else {
+                                    tdInside.textContent = 'No products found.';
+                                }
+
+                                trBody.appendChild(tdLocationCode);
+                                trBody.appendChild(tdParentCode);
+                                trBody.appendChild(tdPosition);
+                                trBody.appendChild(tdInside);
+                                tbody.appendChild(trBody);
+                            }
+                        });
+                    }
+                });
+
+                locationDetails.appendChild(table);
+            }
+
+
+
+            function findStockByProductId (productId) {
+                return stocks.find(stock => stock.productId === productId);
+            }
+
+            window.searchProduct = function () {
+                const productCode = document.getElementById('productCode').value.trim().toUpperCase();
+
+                let found = false;
+
+                const product = products.find(product => product.code.toUpperCase() === productCode);
+                if (product) {
+                    found = true;
+                    const stock = findStockByProductId(product.id);
+                    if (stock) {
+                        const location = transformedData.find(item => item.locations && item.locations.some(location => location.id === stock.placeId && location.placeTypeCode === 'Location'));
+                        if (location) {
+                            console.log(`Product found: ${productCode}. It will be highlighted`);
+                            highlightItem(location.x, location.z);
+                        } else {
+                            console.log(`Location not found for product: ${productCode}.`);
+                        }
+                    } else {
+                        console.log(`No stock found for product: ${productCode}.`);
+                    }
+                }
+
+                if (!found) {
+                    transformedData.forEach(item => {
+                        if (item.code && item.code.toUpperCase() === productCode) {
+                            found = true;
+                            if (item.placeTypeCode === 'User' || item.placeTypeCode === 'Dock' || item.placeTypeCode === 'Buffer') {
+                                console.log(`${productCode}. It will be highlighted`);
+                                highlightItem(item.x, item.z);
+                            }
+                        } else if (item.locations) {
+                            item.locations.forEach(location => {
+                                if (location.code && location.code.toUpperCase() === productCode) {
+                                    found = true;
+                                    console.log(`Location found: ${productCode}. It will be highlighted`);
+                                    highlightItem(location.x, location.z);
+                                }
+                            });
+                        }
+                    });
+                }
+
+                if (!found) {
+                    console.log(`Product not found: ${productCode}.`);
+                }
+            };
+
+            window.autocompleteSearch = function () {
+                let input = document.getElementById('productCode');
+                let filter = input.value.toUpperCase();
+                let ul = document.getElementById('autocomplete-results');
+                ul.innerHTML = '';
+
+                let suggestions = [];
+
+                products.forEach(product => {
+                    if (product.code.toUpperCase().startsWith(filter)) {
+                        suggestions.push(product.code);
+                    }
+                });
+
+                transformedData.forEach(item => {
+                    if (item.code && item.code.toUpperCase().startsWith(filter)) {
+                        suggestions.push(item.code);
+                    }
+                    if (Array.isArray(item.locations)) {
+                        item.locations.forEach(location => {
+                            if (location.code && location.code.toUpperCase().startsWith(filter)) {
+                                suggestions.push(location.code);
+                            }
+                        });
+                    }
+                });
+
+                suggestions = suggestions.slice(0, 4);
+
+                suggestions.forEach(suggestion => {
+                    let li = document.createElement('li');
+                    li.textContent = suggestion;
+                    li.onclick = function () {
+                        input.value = suggestion;
+                        ul.innerHTML = '';
+                        searchProduct();
+                    };
+                    ul.appendChild(li);
+                });
+            };
+
+            function highlightItem (x, z) {
+                const highlightColor = 0xffeb3b;
+                const square = createSquare(x, z, highlightColor, true);
+                mapContainer.addChild(square);
+                viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
+            }
+
+            document.addEventListener('click', function (event) {
+                const autocompleteList = document.getElementById('autocomplete-results');
+                if (!event.target.matches('#productCode')) {
+                    autocompleteList.innerHTML = '';
+                }
+            });
+
+            createTiles();
+
+            const zoomInButton = document.getElementById('zoomIn');
+            const zoomOutButton = document.getElementById('zoomOut');
+
+            zoomInButton.addEventListener('click', () => {
+                viewport.zoomPercent(0.1);
+                console.log('Zoom In clicked');
+            });
+
+            zoomOutButton.addEventListener('click', () => {
+                viewport.zoomPercent(-0.1);
+                console.log('Zoom Out clicked');
+            });
+
