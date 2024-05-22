@@ -277,7 +277,7 @@ html(lang="en")
                 switch (true) {
                     case isUserSquare:
                         elementType = "User";
-                        displayUserInfo();
+                        displayUserInfo(x, z);
                         break;
                     case isLocationSquare:
                         elementType = "Location";
@@ -292,8 +292,101 @@ html(lang="en")
                 titleInfo.querySelector('h2').textContent = `${elementType} Details`;
             }
 
-            function displayUserInfo () {
-                console.log("You are calling this function")
+            function displayUserInfo (x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.innerHTML = '';
+
+                const user = transformedData.find(item => item.placeTypeCode === "User" && item.x === x && item.z === z);
+
+                if (user) {
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    const trHead = document.createElement('tr');
+
+                    const thId = document.createElement('th');
+                    thId.textContent = 'User ID';
+                    const thCode = document.createElement('th');
+                    thCode.textContent = 'Code';
+                    const thName = document.createElement('th');
+                    thName.textContent = 'Name';
+                    const thSurname = document.createElement('th');
+                    thSurname.textContent = 'Surname';
+                    const thPosition = document.createElement('th');
+                    thPosition.textContent = 'Position';
+
+                    trHead.appendChild(thId);
+                    trHead.appendChild(thCode);
+                    trHead.appendChild(thName);
+                    trHead.appendChild(thSurname);
+                    trHead.appendChild(thPosition);
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    const trBody = document.createElement('tr');
+
+                    const tdId = document.createElement('td');
+                    tdId.textContent = user.id;
+                    const tdCode = document.createElement('td');
+                    tdCode.textContent = user.code;
+                    const tdName = document.createElement('td');
+                    tdName.textContent = user.name || 'N/A';
+                    const tdSurname = document.createElement('td');
+                    tdSurname.textContent = user.surname || 'N/A';
+                    const tdPosition = document.createElement('td');
+                    tdPosition.textContent = `| x = ${user.x} | y = ${user.y || 0} | z = ${user.z} |`;
+
+                    trBody.appendChild(tdId);
+                    trBody.appendChild(tdCode);
+                    trBody.appendChild(tdName);
+                    trBody.appendChild(tdSurname);
+                    trBody.appendChild(tdPosition);
+                    tbody.appendChild(trBody);
+
+                    // Carried Places
+                    if (user.carriedPlaces && user.carriedPlaces.length > 0) {
+                        const carriedPlacesHeader = document.createElement('tr');
+                        carriedPlacesHeader.innerHTML = `<th colspan="5">Carried Places</th>`;
+                        tbody.appendChild(carriedPlacesHeader);
+
+                        user.carriedPlaces.forEach(place => {
+                            const trPlace = document.createElement('tr');
+                            trPlace.innerHTML = `<td colspan="2">Code: ${place.code}</td><td colspan="3">Weight: ${place.weight}</td>`;
+                            tbody.appendChild(trPlace);
+                        });
+                    }
+
+                    // Carried Stocks
+                    if (user.carriedStocks && user.carriedStocks.length > 0) {
+                        const carriedStocksHeader = document.createElement('tr');
+                        carriedStocksHeader.innerHTML = `<th colspan="5">Carried Stocks</th>`;
+                        tbody.appendChild(carriedStocksHeader);
+
+                        user.carriedStocks.forEach(stock => {
+                            const trStock = document.createElement('tr');
+                            trStock.innerHTML = `<td colspan="2">Code: ${stock.code}</td><td colspan="3">Quantity: ${stock.quantity}</td>`;
+                            tbody.appendChild(trStock);
+                        });
+                    }
+
+                    // Orders
+                    if (user.orders && user.orders.length > 0) {
+                        const ordersHeader = document.createElement('tr');
+                        ordersHeader.innerHTML = `<th colspan="5">Orders</th>`;
+                        tbody.appendChild(ordersHeader);
+
+                        user.orders.forEach(order => {
+                            const trOrder = document.createElement('tr');
+                            trOrder.innerHTML = `<td colspan="2">Code: ${order.code}</td><td colspan="3">Task Movements: ${order.taskmovements}</td>`;
+                            tbody.appendChild(trOrder);
+                        });
+                    }
+
+                    locationDetails.appendChild(table);
+                } else {
+                    console.log("User not found.");
+                }
             }
 
             function displayLocationInfo (x, z) {
@@ -365,6 +458,8 @@ html(lang="en")
 
                 locationDetails.appendChild(table);
             }
+
+
 
             function findStockByProductId (productId) {
                 return stocks.find(stock => stock.productId === productId);
