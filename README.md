@@ -29,6 +29,21 @@ The coordenates axis is:
       - / - |    
 ```
 
+The 2D coordenates axis is:
+
+Nothe that the z axis becomes the y
+
+```text
+ y
+|
+|
+|
+|
+|___________ x
+```
+
+
+
 ## Development guidelines
 
 ### How to work with the project
