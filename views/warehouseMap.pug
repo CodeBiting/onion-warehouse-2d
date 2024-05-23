@@ -6,22 +6,65 @@ html(lang="en")
         script(src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.4/browser/pixi.min.js" integrity="sha512-MLJM72M8frjnFXEvWn3NaVkrSxlDnbRK/Iwyr7loPca+13SdS9B5sNLHoIkDxfPOndP8WReNdwGLxisYUapc7A==" crossorigin="anonymous" referrerpolicy="no-referrer")
         script(src="https://cdn.jsdelivr.net/npm/pixi-viewport@4.30.0/dist/viewport.min.js")
         style.
-            #autocomplete-container {
-                position: relative;
-                width: 40%;
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                box-sizing: border-box;
             }
 
-            #buttons {
+            #header {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            #main-container {
                 display: flex;
-                justify-content: flex-end;
-                width: 70%;
-                margin-left: 3%;
+                flex-direction: column;
+                gap: 20px;
+                width: 90%;
+                margin-top: 20px;
+                flex: 1;
+            }
+
+            @media (min-width: 768px) {
+                #main-container {
+                    flex-direction: row;
+                }
+            }
+
+            #left-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                flex: 1;
+                position: relative;
+            }
+
+            #right-panel {
+                flex: 2;
+                display: flex;
+                flex-direction: column;
+                margin-top: 5%;
+                align-items: center;
+                margin-bottom: 5%;
+            }
+
+            #autocomplete-container {
+                position: relative;
+                width: 100%;
             }
 
             #autocomplete-results {
                 position: absolute;
-                width: 300px;
-                top: 100%;
+                width: 100%;
+                top: 35px;
                 left: 0;
                 right: 0;
                 z-index: 1000;
@@ -43,31 +86,24 @@ html(lang="en")
                 background-color: #f0f0f0;
             }
 
-            body {
+            #buttons {
                 display: flex;
-                flex-direction: column;
                 gap: 10px;
-            }
-
-            canvas {
-                width: 69%;
-            }
-
-            #product-interaction-section {
-                display: flex;
-                align-items: center;
-                width: 68%;
+                margin-top: 15px;
+                flex-wrap: wrap;
             }
 
             #location-details {
-                width: 29%;
-                max-height: 500px;
+
+                max-height: 400px;
                 overflow-y: auto;
                 border: 3px solid #ccc;
                 padding: 10px;
-
+                background-color: #fff;
+                margin-top: 20px;
             }
-            #location-details table{
+
+            #location-details table {
                 width: 100%;
                 border-collapse: collapse;
             }
@@ -81,59 +117,56 @@ html(lang="en")
             #location-details tr:nth-child(even) {
                 background-color: #f2f2f2;
             }
+
             #location-details th {
                 background-color: #4CAF50;
                 color: white;
             }
+
             #pixi-canvas-container {
                 display: flex;
-                flex-direction: column-reverse;
-                gap: 5%;
-            }
-            #title{
-                display: flex;
-                justify-content: center;
-                margin-bottom: 20px;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                margin-top: 20px;
+                flex: 1;
             }
 
-            #titleInfo{
-                display: flex;
-                justify-content: center;
-                width: 32%;
-            }
-            #location-details-section{
-                display: flex;
+            canvas {
+                width: 100%;
                 height: auto;
+                max-width: 800px;
+                max-height: 500px;
+                transition: width 0.5s, height 0.5s;
             }
 
 
     body
-        #title
+        #header
             h1 Warehouse Map
-        #location-details-section
-            #product-interaction-section
+
+        #main-container
+            #left-panel
                 #autocomplete-container
                     input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
                     ul#autocomplete-results
-                    button(onclick="searchProduct()") Search
-
                 #buttons
+                    button(onclick="searchProduct()") Search
                     button#zoomIn Zoom In
                     button#zoomOut Zoom Out
+                #location-details
+                    table
+                        thead
+                            tr
+                                th Location Code
+                                th Parent Code
+                                th Position
+                                th Inside
+                        tbody
 
+            #right-panel
+                #pixi-canvas-container
 
-        #pixi-canvas-container
-            #location-details
-                table
-                    thead
-                        tr
-                            th Location Code
-                            th Parent Code
-                            th Position
-                            th Inside
-                    tbody
-            #titleInfo
-                h2 Details
 
         script.
             const transformedData = !{JSON.stringify(data)};
@@ -142,8 +175,8 @@ html(lang="en")
             console.log(transformedData);
 
             const app = new PIXI.Application({
-                width: 1000,
-                height: 500,
+                width: 600,
+                height: 300,
                 backgroundColor: 0xffffff,
             });
             const canvasContainer = document.getElementById('pixi-canvas-container');
@@ -152,8 +185,8 @@ html(lang="en")
             app.view.style.border = '4px solid #000000';
 
             const viewport = new PIXI.Viewport({
-                screenWidth: 1000,
-                screenHeight: 500,
+                screenWidth: 600,
+                screenHeight: 300,
                 worldWidth: 1000,
                 worldHeight: 600,
                 interaction: app.renderer.plugins.interaction
@@ -170,8 +203,8 @@ html(lang="en")
                 const square = new PIXI.Container();
                 square.x = x * 25;
                 square.y = z * 25;
-                square.interactive = true; // Make it interactive
-                square.on('pointerdown', () => displayInfo(x, z)); // Add event listener
+                square.interactive = true;
+                square.on('pointerdown', () => displayInfo(x, z));
 
                 if (color !== 0xffffff) {
                     const graphics = new PIXI.Graphics();
@@ -198,7 +231,6 @@ html(lang="en")
             }
 
             function createTiles () {
-                // Locations
                 transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
                     locationGroup.locations.forEach((location) => {
                         const square = createSquare(location.x, location.z, false, 0xffffff);
@@ -206,7 +238,6 @@ html(lang="en")
                     });
                 });
 
-                // Users
                 const users = transformedData.filter(item => item.placeTypeCode === "User");
                 console.log('Users:', users);
                 users.forEach((user) => {
@@ -215,14 +246,12 @@ html(lang="en")
                     mapContainer.addChild(square);
                 });
 
-                // Docks
                 transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
                     const color = 0xff0000;
                     const square = createSquare(dock.x, dock.z, "dock", color);
                     mapContainer.addChild(square);
                 });
 
-                // Buffer
                 transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
                     const color = 0xff8000;
                     const square = createSquare(buffer.x, buffer.z, "buffer", color);
@@ -236,9 +265,9 @@ html(lang="en")
                         return true;
                     }
                 }
-
                 return false;
             }
+
             function isLocation (x, z) {
                 for (const item of transformedData) {
                     if (Array.isArray(item.locations)) {
@@ -256,12 +285,10 @@ html(lang="en")
                         return true;
                     }
                 }
-
                 return false;
             }
 
             function isDock (x, z) {
-
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "Dock" && item.x === x && item.z === z) {
                         return true;
@@ -284,16 +311,16 @@ html(lang="en")
                         displayLocationInfo(x, z);
                         break;
                     default:
-                        console.log("No information available for this square");
-                        return;
+                        console.log("No information available for this element.");
                 }
-
-                const titleInfo = document.getElementById('titleInfo');
-                titleInfo.querySelector('h2').textContent = `${elementType} Details`;
             }
 
             function displayUserInfo () {
-                console.log("You are calling this function")
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.innerHTML = '';
+                const message = document.createElement('p');
+                message.textContent = 'No details available for user.';
+                locationDetails.appendChild(message);
             }
 
             function displayLocationInfo (x, z) {
@@ -366,6 +393,7 @@ html(lang="en")
                 locationDetails.appendChild(table);
             }
 
+
             function findStockByProductId (productId) {
                 return stocks.find(stock => stock.productId === productId);
             }
@@ -384,6 +412,7 @@ html(lang="en")
                         if (location) {
                             console.log(`Product found: ${productCode}. It will be highlighted`);
                             highlightItem(location.x, location.z);
+                            displayLocationInfo(location.x, location.z); // Update details section
                         } else {
                             console.log(`Location not found for product: ${productCode}.`);
                         }
@@ -399,6 +428,7 @@ html(lang="en")
                             if (item.placeTypeCode === 'User' || item.placeTypeCode === 'Dock' || item.placeTypeCode === 'Buffer') {
                                 console.log(`${productCode}. It will be highlighted`);
                                 highlightItem(item.x, item.z);
+                                // If you need to update details section for other types, add corresponding functions
                             }
                         } else if (item.locations) {
                             item.locations.forEach(location => {
@@ -406,6 +436,7 @@ html(lang="en")
                                     found = true;
                                     console.log(`Location found: ${productCode}. It will be highlighted`);
                                     highlightItem(location.x, location.z);
+                                    displayLocationInfo(location.x, location.z); // Update details section
                                 }
                             });
                         }
@@ -460,7 +491,7 @@ html(lang="en")
 
             function highlightItem (x, z) {
                 const highlightColor = 0xffeb3b;
-                const square = createSquare(x, z, highlightColor, true);
+                const square = createSquare(x, z, true); // Pass true for highlighting
                 mapContainer.addChild(square);
                 viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
             }
