@@ -6,22 +6,65 @@ html(lang="en")
         script(src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.4/browser/pixi.min.js" integrity="sha512-MLJM72M8frjnFXEvWn3NaVkrSxlDnbRK/Iwyr7loPca+13SdS9B5sNLHoIkDxfPOndP8WReNdwGLxisYUapc7A==" crossorigin="anonymous" referrerpolicy="no-referrer")
         script(src="https://cdn.jsdelivr.net/npm/pixi-viewport@4.30.0/dist/viewport.min.js")
         style.
-            #autocomplete-container {
-                position: relative;
-                width: 40%;
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                box-sizing: border-box;
             }
 
-            #buttons {
+            #header {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            #main-container {
                 display: flex;
-                justify-content: flex-end;
-                width: 70%;
-                margin-left: 3%;
+                flex-direction: column;
+                gap: 20px;
+                width: 90%;
+                margin-top: 20px;
+                flex: 1;
+            }
+
+            @media (min-width: 768px) {
+                #main-container {
+                    flex-direction: row;
+                }
+            }
+
+            #left-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                flex: 1;
+                position: relative;
+            }
+
+            #right-panel {
+                flex: 2;
+                display: flex;
+                flex-direction: column;
+                margin-top: 5%;
+                align-items: center;
+                margin-bottom: 5%;
+            }
+
+            #autocomplete-container {
+                position: relative;
+                width: 100%;
             }
 
             #autocomplete-results {
                 position: absolute;
-                width: 300px;
-                top: 100%;
+                width: 100%;
+                top: 35px;
                 left: 0;
                 right: 0;
                 z-index: 1000;
@@ -43,31 +86,25 @@ html(lang="en")
                 background-color: #f0f0f0;
             }
 
-            body {
+            #buttons {
                 display: flex;
-                flex-direction: column;
                 gap: 10px;
-            }
-
-            canvas {
-                width: 69%;
-            }
-
-            #product-interaction-section {
-                display: flex;
-                align-items: center;
-                width: 68%;
+                margin-top: 15px;
+                flex-wrap: wrap;
             }
 
             #location-details {
-                width: 29%;
-                max-height: 500px;
+
+                max-height: 400px;
                 overflow-y: auto;
                 border: 3px solid #ccc;
                 padding: 10px;
-
+                background-color: #fff;
+                margin-top: 20px;
+                display: none;
             }
-            #location-details table{
+
+            #location-details table {
                 width: 100%;
                 border-collapse: collapse;
             }
@@ -81,59 +118,56 @@ html(lang="en")
             #location-details tr:nth-child(even) {
                 background-color: #f2f2f2;
             }
+
             #location-details th {
                 background-color: #4CAF50;
                 color: white;
             }
+
             #pixi-canvas-container {
                 display: flex;
-                flex-direction: column-reverse;
-                gap: 5%;
-            }
-            #title{
-                display: flex;
-                justify-content: center;
-                margin-bottom: 20px;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                margin-top: 20px;
+                flex: 1;
             }
 
-            #titleInfo{
-                display: flex;
-                justify-content: center;
-                width: 32%;
-            }
-            #location-details-section{
-                display: flex;
+            canvas {
+                width: 100%;
                 height: auto;
+                max-width: 800px;
+                max-height: 500px;
+                transition: width 0.5s, height 0.5s;
             }
 
 
     body
-        #title
+        #header
             h1 Warehouse Map
-        #location-details-section
-            #product-interaction-section
+
+        #main-container
+            #left-panel
                 #autocomplete-container
                     input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
                     ul#autocomplete-results
-                    button(onclick="searchProduct()") Search
-
                 #buttons
+                    button(onclick="searchProduct()") Search
                     button#zoomIn Zoom In
                     button#zoomOut Zoom Out
+                #location-details
+                    table
+                        thead
+                            tr
+                                th Location Code
+                                th Parent Code
+                                th Position
+                                th Inside
+                        tbody
 
+            #right-panel
+                #pixi-canvas-container
 
-        #pixi-canvas-container
-            #location-details
-                table
-                    thead
-                        tr
-                            th Location Code
-                            th Parent Code
-                            th Position
-                            th Inside
-                    tbody
-            #titleInfo
-                h2 Details
 
         script.
             const transformedData = !{JSON.stringify(data)};
@@ -142,8 +176,8 @@ html(lang="en")
             console.log(transformedData);
 
             const app = new PIXI.Application({
-                width: 1000,
-                height: 500,
+                width: 600,
+                height: 300,
                 backgroundColor: 0xffffff,
             });
             const canvasContainer = document.getElementById('pixi-canvas-container');
@@ -152,8 +186,8 @@ html(lang="en")
             app.view.style.border = '4px solid #000000';
 
             const viewport = new PIXI.Viewport({
-                screenWidth: 1000,
-                screenHeight: 500,
+                screenWidth: 600,
+                screenHeight: 300,
                 worldWidth: 1000,
                 worldHeight: 600,
                 interaction: app.renderer.plugins.interaction
@@ -166,20 +200,32 @@ html(lang="en")
             const mapContainer = new PIXI.Container();
             viewport.addChild(mapContainer);
 
-            function createSquare (x, z, highlight = false, color = 0xffffff) {
+            function createSquare (x, z, highlight = false, type = "default") {
                 const square = new PIXI.Container();
                 square.x = x * 25;
                 square.y = z * 25;
-                square.interactive = true; // Make it interactive
-                square.on('pointerdown', () => displayInfo(x, z)); // Add event listener
+                square.interactive = true;
+                square.on('pointerdown', () => displayInfo(x, z));
 
-                if (color !== 0xffffff) {
-                    const graphics = new PIXI.Graphics();
-                    graphics.beginFill(color, 1);
-                    graphics.drawRect(0, 0, 25, 25);
-                    graphics.endFill();
-                    square.addChild(graphics);
+                let imageUrl = '';
+                switch (type) {
+                    case 'User':
+                        imageUrl = '/images/thumbnail_icona-operari.png';
+                        break;
+                    case 'Dock':
+                        imageUrl = '/images/icona-door.png';
+                        break;
+                    case 'Buffer':
+                        imageUrl = '/images/thumbnail_icona-buffer.png';
+                        break;
+                    default:
+                        imageUrl = '/images/thumbnail_icona-estanteria-2.png';
                 }
+
+                const image = new PIXI.Sprite.from(imageUrl);
+                image.width = 25;
+                image.height = 25;
+                square.addChild(image);
 
                 if (highlight) {
                     const highlightOverlay = new PIXI.Graphics();
@@ -187,45 +233,32 @@ html(lang="en")
                     highlightOverlay.drawRect(0, 0, 25, 25);
                     highlightOverlay.endFill();
                     square.addChild(highlightOverlay);
-                } else {
-                    const image = new PIXI.Sprite.from('/images/thumbnail_icona-estanteria-2.png');
-                    image.width = 25;
-                    image.height = 25;
-                    square.addChild(image);
                 }
 
                 return square;
             }
 
             function createTiles () {
-                // Locations
                 transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
                     locationGroup.locations.forEach((location) => {
-                        const square = createSquare(location.x, location.z, false, 0xffffff);
+                        const square = createSquare(location.x, location.z, false, 'default');
                         mapContainer.addChild(square);
                     });
                 });
 
-                // Users
                 const users = transformedData.filter(item => item.placeTypeCode === "User");
-                console.log('Users:', users);
                 users.forEach((user) => {
-                    const color = 0x00ff00;
-                    const square = createSquare(user.x, user.z, "user", color);
+                    const square = createSquare(user.x, user.z, false, 'User');
                     mapContainer.addChild(square);
                 });
 
-                // Docks
                 transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
-                    const color = 0xff0000;
-                    const square = createSquare(dock.x, dock.z, "dock", color);
+                    const square = createSquare(dock.x, dock.z, false, 'Dock');
                     mapContainer.addChild(square);
                 });
 
-                // Buffer
                 transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
-                    const color = 0xff8000;
-                    const square = createSquare(buffer.x, buffer.z, "buffer", color);
+                    const square = createSquare(buffer.x, buffer.z, false, 'Buffer');
                     mapContainer.addChild(square);
                 });
             }
@@ -236,9 +269,9 @@ html(lang="en")
                         return true;
                     }
                 }
-
                 return false;
             }
+
             function isLocation (x, z) {
                 for (const item of transformedData) {
                     if (Array.isArray(item.locations)) {
@@ -256,12 +289,10 @@ html(lang="en")
                         return true;
                     }
                 }
-
                 return false;
             }
 
             function isDock (x, z) {
-
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "Dock" && item.x === x && item.z === z) {
                         return true;
@@ -273,27 +304,31 @@ html(lang="en")
             function displayInfo (x, z) {
                 const isUserSquare = isUser(x, z);
                 const isLocationSquare = isLocation(x, z);
+                const isBufferSquare = isBuffer(x, z);
+                const isDockSquare = isDock(x, z);
 
                 switch (true) {
                     case isUserSquare:
-                        elementType = "User";
                         displayUserInfo(x, z);
                         break;
                     case isLocationSquare:
-                        elementType = "Location";
                         displayLocationInfo(x, z);
                         break;
+                    case isBufferSquare:
+                        displayBufferInfo(x, z);
+                        break;
+                    case isDockSquare:
+                        displayDockInfo(x, z);
+                        break;
                     default:
-                        console.log("No information available for this square");
-                        return;
+                        console.log("No information available for this element.");
                 }
-
-                const titleInfo = document.getElementById('titleInfo');
-                titleInfo.querySelector('h2').textContent = `${elementType} Details`;
             }
+
 
             function displayUserInfo (x, z) {
                 const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
 
                 const user = transformedData.find(item => item.placeTypeCode === "User" && item.x === x && item.z === z);
@@ -391,6 +426,7 @@ html(lang="en")
 
             function displayLocationInfo (x, z) {
                 const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
 
                 const table = document.createElement('table');
@@ -459,6 +495,144 @@ html(lang="en")
                 locationDetails.appendChild(table);
             }
 
+            function displayBufferInfo (x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
+                locationDetails.innerHTML = '';
+
+                const buffer = transformedData.find(item => item.placeTypeCode === "Buffer" && item.x === x && item.z === z);
+
+                if (buffer) {
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    const trHead = document.createElement('tr');
+
+                    const thLocationCode = document.createElement('th');
+                    thLocationCode.textContent = 'Buffer Code';
+                    const thParentCode = document.createElement('th');
+                    thParentCode.textContent = 'Parent Code';
+                    const thPosition = document.createElement('th');
+                    thPosition.textContent = 'Position';
+                    const thInside = document.createElement('th');
+                    thInside.textContent = 'Inside';
+
+                    trHead.appendChild(thLocationCode);
+                    trHead.appendChild(thParentCode);
+                    trHead.appendChild(thPosition);
+                    trHead.appendChild(thInside);
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    const trBody = document.createElement('tr');
+
+                    const tdLocationCode = document.createElement('td');
+                    tdLocationCode.textContent = buffer.code;
+                    const tdParentCode = document.createElement('td');
+                    const regex = /^[A-Za-z]\s*\d{6}$/;
+                    const isStandardFormat = regex.test(buffer.code.replace(/\s/g, ''));
+                    tdParentCode.textContent = isStandardFormat ? buffer.code.trim().charAt(0) : buffer.code;
+
+                    const tdPosition = document.createElement('td');
+                    tdPosition.textContent = `| x = ${buffer.x} | y = ${buffer.y || 0} | z = ${buffer.z} |`;
+
+                    const tdInside = document.createElement('td');
+                    const bufferStocks = stocks.filter(stock => stock.placeId === buffer.id);
+                    if (bufferStocks.length > 0) {
+                        bufferStocks.forEach(stock => {
+                            const product = products.find(product => product.id === stock.productId);
+                            if (product) {
+                                const productInfo = document.createElement('div');
+                                productInfo.textContent = `${product.name} = ${stock.quantity} Units`;
+                                tdInside.appendChild(productInfo);
+                            }
+                        });
+                    } else {
+                        tdInside.textContent = 'No products found.';
+                    }
+
+                    trBody.appendChild(tdLocationCode);
+                    trBody.appendChild(tdParentCode);
+                    trBody.appendChild(tdPosition);
+                    trBody.appendChild(tdInside);
+                    tbody.appendChild(trBody);
+
+                    locationDetails.appendChild(table);
+                } else {
+                    console.log("Buffer not found.");
+                }
+            }
+
+            function displayDockInfo (x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
+                locationDetails.innerHTML = '';
+
+                const dock = transformedData.find(item => item.placeTypeCode === "Dock" && item.x === x && item.z === z);
+
+                if (dock) {
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    const trHead = document.createElement('tr');
+
+                    const thLocationCode = document.createElement('th');
+                    thLocationCode.textContent = 'Dock Code';
+                    const thParentCode = document.createElement('th');
+                    thParentCode.textContent = 'Parent Code';
+                    const thPosition = document.createElement('th');
+                    thPosition.textContent = 'Position';
+                    const thInside = document.createElement('th');
+                    thInside.textContent = 'Inside';
+
+                    trHead.appendChild(thLocationCode);
+                    trHead.appendChild(thParentCode);
+                    trHead.appendChild(thPosition);
+                    trHead.appendChild(thInside);
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    const trBody = document.createElement('tr');
+
+                    const tdLocationCode = document.createElement('td');
+                    tdLocationCode.textContent = dock.code;
+                    const tdParentCode = document.createElement('td');
+                    const regex = /^[A-Za-z]\s*\d{6}$/;
+                    const isStandardFormat = regex.test(dock.code.replace(/\s/g, ''));
+                    tdParentCode.textContent = isStandardFormat ? dock.code.trim().charAt(0) : dock.code;
+
+                    const tdPosition = document.createElement('td');
+                    tdPosition.textContent = `| x = ${dock.x} | y = ${dock.y || 0} | z = ${dock.z} |`;
+
+                    const tdInside = document.createElement('td');
+                    const dockStocks = stocks.filter(stock => stock.placeId === dock.id);
+                    if (dockStocks.length > 0) {
+                        dockStocks.forEach(stock => {
+                            const product = products.find(product => product.id === stock.productId);
+                            if (product) {
+                                const productInfo = document.createElement('div');
+                                productInfo.textContent = `${product.name} = ${stock.quantity} Units`;
+                                tdInside.appendChild(productInfo);
+                            }
+                        });
+                    } else {
+                        tdInside.textContent = 'No products found.';
+                    }
+
+                    trBody.appendChild(tdLocationCode);
+                    trBody.appendChild(tdParentCode);
+                    trBody.appendChild(tdPosition);
+                    trBody.appendChild(tdInside);
+                    tbody.appendChild(trBody);
+
+                    locationDetails.appendChild(table);
+                } else {
+                    console.log("Dock not found.");
+                }
+            }
+
 
 
             function findStockByProductId (productId) {
@@ -479,6 +653,7 @@ html(lang="en")
                         if (location) {
                             console.log(`Product found: ${productCode}. It will be highlighted`);
                             highlightItem(location.x, location.z);
+                            displayLocationInfo(location.x, location.z); // Update details section
                         } else {
                             console.log(`Location not found for product: ${productCode}.`);
                         }
@@ -494,6 +669,7 @@ html(lang="en")
                             if (item.placeTypeCode === 'User' || item.placeTypeCode === 'Dock' || item.placeTypeCode === 'Buffer') {
                                 console.log(`${productCode}. It will be highlighted`);
                                 highlightItem(item.x, item.z);
+                                // If you need to update details section for other types, add corresponding functions
                             }
                         } else if (item.locations) {
                             item.locations.forEach(location => {
@@ -501,6 +677,7 @@ html(lang="en")
                                     found = true;
                                     console.log(`Location found: ${productCode}. It will be highlighted`);
                                     highlightItem(location.x, location.z);
+                                    displayLocationInfo(location.x, location.z); // Update details section
                                 }
                             });
                         }
@@ -555,7 +732,7 @@ html(lang="en")
 
             function highlightItem (x, z) {
                 const highlightColor = 0xffeb3b;
-                const square = createSquare(x, z, highlightColor, true);
+                const square = createSquare(x, z, true, 'highlight');
                 mapContainer.addChild(square);
                 viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
             }
