@@ -9,6 +9,7 @@ const stocksData = require('../data/stocks.json');
 
 router.get('/', function (req, res, next) {
     const transformedData = jsonConvert('WH', warehouse, users);
+    console.log(warehouse);
     res.render('warehouseMap', { data: transformedData, productsData: productsData, stocksData: stocksData });
 });
 
