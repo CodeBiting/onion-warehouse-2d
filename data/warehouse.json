@@ -46526,7 +46526,7 @@
     "z": 9,
     "subtypeId": "NULL",
     "allowStock": 0,
-    "parentId": 1009,
+    "parentId": 1002,
     "numPicking": 0,
     "avgPickingSeconds": 0
   },
@@ -46568,7 +46568,7 @@
     "z": 9,
     "subtypeId": "NULL",
     "allowStock": 0,
-    "parentId": 1009,
+    "parentId": 1002,
     "numPicking": 6,
     "avgPickingSeconds": 194.35566666666665
   },
