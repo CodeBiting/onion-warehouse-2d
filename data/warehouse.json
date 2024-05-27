@@ -29,9 +29,11 @@
     "avgPickingSeconds": 0,
     "status": [
       {
+        "id": 2,
         "code": "Freeze"
       },
       {
+        "id": 3,
         "code": "Quarantine"
       }
     ]
