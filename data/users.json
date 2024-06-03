@@ -29,7 +29,13 @@
       "subtypeId": "NULL",
       "allowStock": 1,
       "parentId": 1002,
-      "carriedPlaces": [],
+      "carriedPlaces": [
+        {
+          "id": 4655,
+          "code": "000000000000000003",
+          "weight": 18
+        }
+      ],
       "carriedStocks": [],
       "orders": []
     },
@@ -57,14 +63,71 @@
         {
           "id": 1001,
           "code": "9786678",
-          "quantity": 10
+          "quantity": 10,
+          "orderId": 1001
         }
       ],
       "orders": [
         {
           "id": 1001,
           "code": "PV34-01620",
-          "taskmovements": 8
+          "taskmovements": 8,
+          "taskmovementsDone": 3,
+          "taskmovementsPending": 5,
+          "client": {
+            "id": 1001,
+            "code": "CLINENT01",
+            "name": "Client 01",
+            "address": "Street 01",
+            "city": "City 01",
+            "zip": "00001",
+            "country": "Country 01",
+            "phone": "000000000",
+            "email": "email@email.com",
+            "contact": "Contact 01"
+          },
+          "lines": [
+            {
+              "id": 1001,
+              "productId": 2,
+              "code": "432342334",
+              "name": "PROD02",
+              "description": "Product 02",
+              "quantity": 1000,
+              "conversion": {
+                "id": 1,
+                "code": "UN",
+                "quantity": 1
+              }
+            }
+          ],
+          "currentTaskmovement": {
+            "id": 1001,
+            "placeFrom": {
+              "id": 2654,
+              "code": "H 038 004",
+              "x": 38,
+              "y": 4,
+              "z": 1
+            },
+            "placeTo": {
+              "id": 2513,
+              "code": "H 041 001",
+              "x": 41,
+              "y": 1,
+              "z": 1
+            },
+            "productId": 2,
+            "code": "432342334",
+            "name": "PROD02",
+            "description": "Product 02",
+            "quantity": 10,
+            "conversion": {
+              "id": 1,
+              "code": "UN",
+              "quantity": 1
+            }
+          }
         }
       ]
     },
