@@ -5,6 +5,9 @@ html(lang="en")
         title 2D Map with Pixi.js
         script(src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.4/browser/pixi.min.js" integrity="sha512-MLJM72M8frjnFXEvWn3NaVkrSxlDnbRK/Iwyr7loPca+13SdS9B5sNLHoIkDxfPOndP8WReNdwGLxisYUapc7A==" crossorigin="anonymous" referrerpolicy="no-referrer")
         script(src="https://cdn.jsdelivr.net/npm/pixi-viewport@4.30.0/dist/viewport.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/chart.js")
+        script(src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels")
+
         style.
             body {
                 display: flex;
@@ -33,9 +36,54 @@ html(lang="en")
                 flex: 1;
             }
 
+            #charts-container {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                align-items: flex-start;
+                justify-content: center;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .chart-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex: 1;
+                max-width: 30%;
+                height: 200px;
+            }
+
+            .chart-container div {
+                margin-bottom: 5px;
+                font-size: 1em;
+                font-weight: bold;
+            }
+
+            .chart-container canvas {
+                width: 100%;
+                height: auto;
+            }
+
             @media (min-width: 768px) {
                 #main-container {
                     flex-direction: row;
+                }
+
+                #left-panel {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    flex: 1;
+                    position: relative;
+                }
+
+                #right-panel {
+                    flex: 2;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
                 }
             }
 
@@ -48,12 +96,10 @@ html(lang="en")
             }
 
             #right-panel {
-                flex: 2;
                 display: flex;
                 flex-direction: column;
-                margin-top: 5%;
                 align-items: center;
-                margin-bottom: 5%;
+                width: 100%;
             }
 
             #autocomplete-container {
@@ -94,7 +140,6 @@ html(lang="en")
             }
 
             #location-details {
-
                 max-height: 400px;
                 overflow-y: auto;
                 border: 3px solid #ccc;
@@ -129,7 +174,8 @@ html(lang="en")
                 flex-direction: column;
                 align-items: center;
                 width: 100%;
-                margin-top: 20px;
+                margin-top: 5%;
+                margin-bottom: 10%;
                 flex: 1;
             }
 
@@ -139,6 +185,12 @@ html(lang="en")
                 max-width: 800px;
                 max-height: 500px;
                 transition: width 0.5s, height 0.5s;
+            }
+
+            #container-right-panel {
+                display: flex;
+                flex-direction: column;
+                flex: 2;
             }
 
 
@@ -165,15 +217,29 @@ html(lang="en")
                                 th Inside
                         tbody
 
-            #right-panel
-                #pixi-canvas-container
+            #container-right-panel
+                #charts-container
+                    .chart-container
+                        div Orders
+                        canvas#ordersChart
+                    .chart-container
+                        div Tasks
+                        canvas#tasksChart
+                    .chart-container
+                        div Users Task
+                        canvas#usersTasksChart
 
+                #right-panel
+                    #pixi-canvas-container
 
         script.
             const transformedData = !{JSON.stringify(data)};
             const products = !{JSON.stringify(productsData)};
             const stocks = !{JSON.stringify(stocksData)};
+            const workload = !{JSON.stringify(workload)};
+
             console.log(transformedData);
+            console.log(workload)
 
             const app = new PIXI.Application({
                 width: 600,
@@ -200,12 +266,17 @@ html(lang="en")
             const mapContainer = new PIXI.Container();
             viewport.addChild(mapContainer);
 
+            let highlightedSquare = null;
+
             function createSquare (x, z, highlight = false, type = "default") {
                 const square = new PIXI.Container();
                 square.x = x * 25;
                 square.y = z * 25;
                 square.interactive = true;
-                square.on('pointerdown', () => displayInfo(x, z));
+                square.on('pointerdown', () => {
+                    displayInfo(x, z);
+                    highlightItem(x, z, false, type);
+                });
 
                 let imageUrl = '';
                 switch (type) {
@@ -217,6 +288,9 @@ html(lang="en")
                         break;
                     case 'Buffer':
                         imageUrl = '/images/thumbnail_icona-buffer.png';
+                        break;
+                    case 'Location':
+                        imageUrl = '/images/thumbnail_icona-estanteria-2.png';
                         break;
                     default:
                         imageUrl = '/images/thumbnail_icona-estanteria-2.png';
@@ -238,10 +312,12 @@ html(lang="en")
                 return square;
             }
 
+
+
             function createTiles () {
                 transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
                     locationGroup.locations.forEach((location) => {
-                        const square = createSquare(location.x, location.z, false, 'default');
+                        const square = createSquare(location.x, location.z, false, 'Location');
                         mapContainer.addChild(square);
                     });
                 });
@@ -263,7 +339,8 @@ html(lang="en")
                 });
             }
 
-            function isUser (x, z) {
+
+            function isUser(x, z) {
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "User" && item.x === x && item.z === z) {
                         return true;
@@ -272,7 +349,7 @@ html(lang="en")
                 return false;
             }
 
-            function isLocation (x, z) {
+            function isLocation(x, z) {
                 for (const item of transformedData) {
                     if (Array.isArray(item.locations)) {
                         if (item.locations.some(location => location.x === x && location.z === z)) {
@@ -283,7 +360,7 @@ html(lang="en")
                 return false;
             }
 
-            function isBuffer (x, z) {
+            function isBuffer(x, z) {
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "Buffer" && item.x === x && item.z === z) {
                         return true;
@@ -292,7 +369,7 @@ html(lang="en")
                 return false;
             }
 
-            function isDock (x, z) {
+            function isDock(x, z) {
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "Dock" && item.x === x && item.z === z) {
                         return true;
@@ -301,7 +378,7 @@ html(lang="en")
                 return false;
             }
 
-            function displayInfo (x, z) {
+            function displayInfo(x, z) {
                 const isUserSquare = isUser(x, z);
                 const isLocationSquare = isLocation(x, z);
                 const isBufferSquare = isBuffer(x, z);
@@ -325,8 +402,7 @@ html(lang="en")
                 }
             }
 
-
-            function displayUserInfo (x, z) {
+            function displayUserInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
@@ -424,7 +500,7 @@ html(lang="en")
                 }
             }
 
-            function displayLocationInfo (x, z) {
+            function displayLocationInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
@@ -495,7 +571,7 @@ html(lang="en")
                 locationDetails.appendChild(table);
             }
 
-            function displayBufferInfo (x, z) {
+            function displayBufferInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
@@ -564,7 +640,7 @@ html(lang="en")
                 }
             }
 
-            function displayDockInfo (x, z) {
+            function displayDockInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
@@ -633,61 +709,74 @@ html(lang="en")
                 }
             }
 
-
-
-            function findStockByProductId (productId) {
+            function findStockByProductId(productId) {
                 return stocks.find(stock => stock.productId === productId);
             }
 
             window.searchProduct = function () {
                 const productCode = document.getElementById('productCode').value.trim().toUpperCase();
-
                 let found = false;
 
+                // Buscar en productos
                 const product = products.find(product => product.code.toUpperCase() === productCode);
                 if (product) {
-                    found = true;
                     const stock = findStockByProductId(product.id);
                     if (stock) {
-                        const location = transformedData.find(item => item.locations && item.locations.some(location => location.id === stock.placeId && location.placeTypeCode === 'Location'));
-                        if (location) {
-                            console.log(`Product found: ${productCode}. It will be highlighted`);
-                            highlightItem(location.x, location.z);
-                            displayLocationInfo(location.x, location.z); // Update details section
-                        } else {
-                            console.log(`Location not found for product: ${productCode}.`);
+                        for (const item of transformedData) {
+                            if (Array.isArray(item.locations)) {
+                                const location = item.locations.find(loc => loc.id === stock.placeId);
+                                if (location) {
+                                    highlightItem(location.x, location.z, true, 'Location');
+                                    displayLocationInfo(location.x, location.z);
+                                    found = true;
+                                    break;
+                                }
+                            }
                         }
-                    } else {
-                        console.log(`No stock found for product: ${productCode}.`);
                     }
                 }
 
+                // Buscar en transformedData
                 if (!found) {
-                    transformedData.forEach(item => {
+                    for (const item of transformedData) {
                         if (item.code && item.code.toUpperCase() === productCode) {
-                            found = true;
-                            if (item.placeTypeCode === 'User' || item.placeTypeCode === 'Dock' || item.placeTypeCode === 'Buffer') {
-                                console.log(`${productCode}. It will be highlighted`);
-                                highlightItem(item.x, item.z);
-                                // If you need to update details section for other types, add corresponding functions
+                            if (item.placeTypeCode === 'User') {
+                                highlightItem(item.x, item.z, true, 'User');
+                                displayUserInfo(item.x, item.z);
+                                found = true;
+                            } else if (item.placeTypeCode === 'Dock') {
+                                highlightItem(item.x, item.z, true, 'Dock');
+                                displayDockInfo(item.x, item.z);
+                                found = true;
+                            } else if (item.placeTypeCode === 'Buffer') {
+                                highlightItem(item.x, item.z, true, 'Buffer');
+                                displayBufferInfo(item.x, item.z);
+                                found = true;
                             }
-                        } else if (item.locations) {
-                            item.locations.forEach(location => {
-                                if (location.code && location.code.toUpperCase() === productCode) {
-                                    found = true;
-                                    console.log(`Location found: ${productCode}. It will be highlighted`);
-                                    highlightItem(location.x, location.z);
-                                    displayLocationInfo(location.x, location.z); // Update details section
-                                }
-                            });
                         }
-                    });
+
+                        // Buscar en ubicaciones anidadas
+                        if (!found && Array.isArray(item.locations)) {
+                            for (const location of item.locations) {
+                                if (location.code && location.code.toUpperCase() === productCode) {
+                                    highlightItem(location.x, location.z, true, 'Location');
+                                    displayLocationInfo(location.x, location.z);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found) break;
+                    }
                 }
 
                 if (!found) {
                     console.log(`Product not found: ${productCode}.`);
                 }
             };
+
+
 
             window.autocompleteSearch = function () {
                 let input = document.getElementById('productCode');
@@ -730,11 +819,34 @@ html(lang="en")
                 });
             };
 
-            function highlightItem (x, z) {
-                const highlightColor = 0xffeb3b;
-                const square = createSquare(x, z, true, 'highlight');
-                mapContainer.addChild(square);
-                viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
+            function highlightItem (x, z, center = false, type = 'default') {
+                if (highlightedSquare) {
+                    mapContainer.removeChild(highlightedSquare);
+                }
+
+                const elementType = type !== 'default' ? type : getElementType(x, z);
+                highlightedSquare = createSquare(x, z, true, elementType);
+                mapContainer.addChild(highlightedSquare);
+
+                if (center) {
+                    viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
+                }
+            }
+
+
+            function getElementType (x, z) {
+                switch (true) {
+                    case isUser(x, z):
+                        return 'User';
+                    case isDock(x, z):
+                        return 'Dock';
+                    case isBuffer(x, z):
+                        return 'Buffer';
+                    case isLocation(x, z):
+                        return 'Location';
+                    default:
+                        return 'default';
+                }
             }
 
             document.addEventListener('click', function (event) {
@@ -757,5 +869,138 @@ html(lang="en")
             zoomOutButton.addEventListener('click', () => {
                 viewport.zoomPercent(-0.1);
                 console.log('Zoom Out clicked');
+            });
+
+            const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+            const ordersChart = new Chart(ordersCtx, {
+                type: 'pie',
+                data: {
+                    labels: workload.orderTotals.map(order => order.typeCode),
+                    datasets: [{
+                        data: workload.orderTotals.map(order => order.numOrders),
+                        backgroundColor: ['red', 'blue', 'green', 'purple', 'orange'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: (value, ctx) => {
+                                let label = ctx.chart.data.labels[ctx.dataIndex];
+                                if (label.length > 6) {
+                                    return label.substring(0, 5) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            const tasksCtx = document.getElementById('tasksChart').getContext('2d');
+            const tasksChart = new Chart(tasksCtx, {
+                type: 'pie',
+                data: {
+                    labels: workload.taskTotals.map(task => task.code),
+                    datasets: [{
+                        data: workload.taskTotals.map(task => task.numTasks),
+                        backgroundColor: ['cyan', 'magenta', 'yellow', 'black'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: (value, ctx) => {
+                                let label = ctx.chart.data.labels[ctx.dataIndex];
+                                if (label.length > 6) {
+                                    return label.substring(0, 5) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            const usersTasksCtx = document.getElementById('usersTasksChart').getContext('2d');
+            const usersTasksChart = new Chart(usersTasksCtx, {
+                type: 'pie',
+                data: {
+                    labels: workload.taskTotalsByUser
+                        .filter(task => task.numTasks > 0)
+                        .map(task => task.code),
+                    datasets: [{
+                        data: workload.taskTotalsByUser
+                            .filter(task => task.numTasks > 0)
+                            .map(task => task.numTasks),
+                        backgroundColor: ['pink', 'green', 'lime', 'teal'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: (value, ctx) => {
+                                let label = ctx.chart.data.labels[ctx.dataIndex];
+                                if (label.length > 6) {
+                                    return label.substring(0, 5) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
             });
 
