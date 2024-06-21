@@ -1,106 +1,169 @@
 [
-    {
-      "id": 2,
-      "code": "system",
-      "name": "",
-      "surname": "",
-      "typeId": 3,
-      "placeTypeCode": "User",
-      "x": 1,
-      "y": 1,
-      "z": 2,
-      "subtypeId": "NULL",
-      "allowStock": 1,
-      "parentId": 1002,
-      "carriedPlaces": [],
-      "carriedStocks": [],
-      "orders": []
-    },
-    {
-      "id": 1000,
-      "code": "boss",
-      "name": "Bruce",
-      "surname": "Springsteen",
-      "typeId": 3,
-      "placeTypeCode": "User",
-      "x": 1,
-      "y": 1,
-      "z": 10,
-      "subtypeId": "NULL",
-      "allowStock": 1,
-      "parentId": 1002,
-      "carriedPlaces": [],
-      "carriedStocks": [],
-      "orders": []
-    },
-    {
-      "id": 1001,
-      "code": "picker1",
-      "name": "John",
-      "surname": "Smith",
-      "typeId": 3,
-      "placeTypeCode": "User",
-      "x": 2,
-      "y": 1,
-      "z": 13,
-      "subtypeId": "NULL",
-      "allowStock": 1,
-      "parentId": 1002,
-      "carriedPlaces": [
-        {
+  {
+    "id": 2,
+    "code": "system",
+    "name": "",
+    "surname": "",
+    "typeId": 3,
+    "placeTypeCode": "User",
+    "x": 1,
+    "y": 1,
+    "z": 2,
+    "subtypeId": "NULL",
+    "allowStock": 1,
+    "parentId": 1002,
+    "carriedPlaces": [],
+    "carriedStocks": [],
+    "orders": []
+  },
+  {
+    "id": 1000,
+    "code": "boss",
+    "name": "Bruce",
+    "surname": "Springsteen",
+    "typeId": 3,
+    "placeTypeCode": "User",
+    "x": 1,
+    "y": 1,
+    "z": 10,
+    "subtypeId": "NULL",
+    "allowStock": 1,
+    "parentId": 1002,
+    "carriedPlaces": [
+      {
+        "id": 4655,
+        "code": "000000000000000003",
+        "weight": 18
+      }
+    ],
+    "carriedStocks": [],
+    "orders": []
+  },
+  {
+    "id": 1001,
+    "code": "picker1",
+    "name": "John",
+    "surname": "Smith",
+    "typeId": 3,
+    "placeTypeCode": "User",
+    "x": 2,
+    "y": 1,
+    "z": 13,
+    "subtypeId": "NULL",
+    "allowStock": 1,
+    "parentId": 1002,
+    "carriedPlaces": [
+      {
+        "id": 1001,
+        "code": "000000000000000001",
+        "weight": 20
+      }
+    ],
+    "carriedStocks": [
+      {
+        "id": 1001,
+        "code": "9786678",
+        "quantity": 10,
+        "orderId": 1001
+      }
+    ],
+    "orders": [
+      {
+        "id": 1001,
+        "code": "PV34-01620",
+        "taskmovements": 8,
+        "taskmovementsDone": 3,
+        "taskmovementsPending": 5,
+        "client": {
           "id": 1001,
-          "code": "000000000000000001",
-          "weight": 20
-        }
-      ],
-      "carriedStocks": [
-        {
+          "code": "CLINENT01",
+          "name": "Client 01",
+          "address": "Street 01",
+          "city": "City 01",
+          "zip": "00001",
+          "country": "Country 01",
+          "phone": "000000000",
+          "email": "email@email.com",
+          "contact": "Contact 01"
+        },
+        "lines": [
+          {
+            "id": 1001,
+            "productId": 2,
+            "code": "432342334",
+            "name": "PROD02",
+            "description": "Product 02",
+            "quantity": 1000,
+            "conversion": {
+              "id": 1,
+              "code": "UN",
+              "quantity": 1
+            }
+          }
+        ],
+        "currentTaskmovement": {
           "id": 1001,
-          "code": "9786678",
-          "quantity": 10
+          "placeFrom": {
+            "id": 2654,
+            "code": "H 038 004",
+            "x": 38,
+            "y": 4,
+            "z": 1
+          },
+          "placeTo": {
+            "id": 2513,
+            "code": "H 041 001",
+            "x": 41,
+            "y": 1,
+            "z": 1
+          },
+          "productId": 2,
+          "code": "432342334",
+          "name": "PROD02",
+          "description": "Product 02",
+          "quantity": 10,
+          "conversion": {
+            "id": 1,
+            "code": "UN",
+            "quantity": 1
+          }
         }
-      ],
-      "orders": [
-        {
-          "id": 1001,
-          "code": "PV34-01620",
-          "taskmovements": 8
-        }
-      ]
-    },
-    {
-      "id": 4458,
-      "code": "picker2",
-      "name": "Peter",
-      "surname": "Parker",
-      "typeId": 3,
-      "placeTypeCode": "User",
-      "x": 5,
-      "y": 1,
-      "z": 7,
-      "subtypeId": "NULL",
-      "allowStock": 1,
-      "parentId": 1002,
-      "carriedPlaces": [
-        {
-          "id": 4458,
-          "code": "000000000000000002",
-          "weight": 20
-        }
-      ],
-      "carriedStocks": [
-        {
-          "id": 4458,
-          "code": "9786678",
-          "quantity": 20
-        }
-      ],
-      "orders": [
-        {
-          "id": 4458,
-          "code": "PV34-00123",
-          "taskmovements": 3
-        }
-      ]
-    }
-  ]
+      }
+    ]
+  },
+  {
+    "id": 4458,
+    "code": "picker2",
+    "name": "Peter",
+    "surname": "Parker",
+    "typeId": 3,
+    "placeTypeCode": "User",
+    "x": 5,
+    "y": 1,
+    "z": 7,
+    "subtypeId": "NULL",
+    "allowStock": 1,
+    "parentId": 1002,
+    "carriedPlaces": [
+      {
+        "id": 4458,
+        "code": "000000000000000002",
+        "weight": 20
+      }
+    ],
+    "carriedStocks": [
+      {
+        "id": 4458,
+        "code": "9786678",
+        "quantity": 20
+      }
+    ],
+    "orders": [
+      {
+        "id": 4458,
+        "code": "PV34-00123",
+        "taskmovements": 3
+      }
+    ]
+  }
+]

@@ -63,7 +63,7 @@ function extractUsers (parentId, whUsers, whJson){
 }
 
 // Group locations that share the same coordinates X - Z and type
-function groupLocations (locations) {
+function groupLocations(locations) {
     const groupedLocations = [];
 
     locations.forEach(location => {
@@ -75,8 +75,17 @@ function groupLocations (locations) {
 
         if (existingGroup) {
             existingGroup.locations.push(location);
+            if (location.status) {
+                existingGroup.status = existingGroup.status || [];
+                location.status.forEach(status => {
+                    if (!existingGroup.status.some(s => s.id === status.id)) {
+                        existingGroup.status.push(status);
+                    }
+                });
+            }
         } else {
             groupedLocations.push({
+                status: location.status ? [...location.status] : undefined,
                 x: location.x,
                 z: location.z,
                 typeId: location.typeId,
@@ -85,9 +94,9 @@ function groupLocations (locations) {
         }
     });
 
-    // console.dir(groupedLocations, { depth: null });
     return groupedLocations;
 }
+
 module.exports = {
     jsonConvert
 };

@@ -10,6 +10,7 @@
     "subtypeId": "NULL",
     "allowStock": 0,
     "parentId": "NULL"
+    
   },
   {
     "id": 1002,
@@ -22,6 +23,7 @@
     "subtypeId": "NULL",
     "allowStock": 1,
     "parentId": 1
+
   },
   {
     "id": 1137,
@@ -34,6 +36,7 @@
     "subtypeId": "NULL",
     "allowStock": 1,
     "parentId": 1002
+    
   },
   {
     "id": 1278,
@@ -69,7 +72,17 @@
     "z": 15,
     "subtypeId": "NULL",
     "allowStock": 0,
-    "parentId": 1002
+    "parentId": 1002,
+    "status": [
+      {
+        "id": 2,
+        "code": "Freeze"
+      },
+      {
+        "id": 3,
+        "code": "Quarantine"
+      }
+    ]
   },
   {
     "id": 1138,
@@ -81,7 +94,17 @@
     "z": 1,
     "subtypeId": 4,
     "allowStock": 1,
-    "parentId": 1137
+    "parentId": 1137,
+    "status": [
+      {
+        "id": 2,
+        "code": "Freeze"
+      },
+      {
+        "id": 3,
+        "code": "Quarantine"
+      }
+    ]
   },
   {
     "id": 1139,
