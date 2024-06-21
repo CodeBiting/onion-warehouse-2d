@@ -139,7 +139,6 @@ html(lang="en")
                 flex-wrap: wrap;
             }
 
-<<<<<<< HEAD
            #location-details, #user-details {
                 display: inline-block; /* Para mostrar ambos contenedores en línea */
                 vertical-align: top;   /* Alinear ambos contenedores en la parte superior */
@@ -155,19 +154,6 @@ html(lang="en")
             }
 
             #location-details table, #user-details table {
-=======
-            #location-details {
-                max-height: 400px;
-                overflow-y: auto;
-                border: 3px solid #ccc;
-                padding: 10px;
-                background-color: #fff;
-                margin-top: 20px;
-                display: none;
-            }
-
-            #location-details table {
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 width: 100%;
                 border-collapse: collapse;
             }
@@ -182,11 +168,7 @@ html(lang="en")
                 background-color: #f2f2f2;
             }
 
-<<<<<<< HEAD
             #location-details th, #user-details th {
-=======
-            #location-details th {
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 background-color: #4CAF50;
                 color: white;
             }
@@ -225,7 +207,6 @@ html(lang="en")
                 #autocomplete-container
                     input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
                     ul#autocomplete-results
-<<<<<<< HEAD
                     button(onclick="searchProduct()") Search
 
                 #state-selector-container
@@ -233,8 +214,6 @@ html(lang="en")
                     button(onclick="highlightLocationsByState()") Highlight Locations
                     span#state-count
 
-=======
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 #buttons
                     button(onclick="searchProduct()") Search
                     button#zoomIn Zoom In
@@ -261,7 +240,6 @@ html(lang="en")
                         div Users Task
                         canvas#usersTasksChart
 
-<<<<<<< HEAD
         #pixi-canvas-container
             #location-details
                 table
@@ -277,25 +255,19 @@ html(lang="en")
         #pixi-canvas-container
             #user-details
                
-=======
-                #right-panel
+                #right-panel  <!-- cambios de Leo -->
                     #pixi-canvas-container
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
 
         script.
             const transformedData = transformData(!{JSON.stringify(data)});
             const products = !{JSON.stringify(productsData)};
             const stocks = !{JSON.stringify(stocksData)};
-<<<<<<< HEAD
             const placeStatusTypes = !{JSON.stringify(placeStatusTypesData)};
-            
-=======
             const workload = !{JSON.stringify(workload)};
 
             console.log(transformedData);
             console.log(workload)
 
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
             const app = new PIXI.Application({
                 width: 600,
                 height: 300,
@@ -321,33 +293,24 @@ html(lang="en")
             const mapContainer = new PIXI.Container();
             viewport.addChild(mapContainer);
 
-<<<<<<< HEAD
-            function createSquare(x, z, highlight = false, color = 0xffffff, locationId = null, statusIds = []) {
+            let highlightedSquare = null;
+
+            function createSquare (x, z, highlight = false, type = "default" , color = 0xffffff, locationId = null, statusIds = []) {
                 const square = new PIXI.Container();
                 square.x = x * 25;
                 square.y = z * 25;
                 square.locationId = locationId;
                 square.statusIds = statusIds; 
                 square.interactive = true;
-                square.on('pointerdown', () => displayInfo(x, z, square));
-
+                square.on('pointerdown', () => {
+                    displayInfo(x, z ,square);
+                    highlightItem(x, z, false, type);
+                });
                 const graphics = new PIXI.Graphics();
                 graphics.beginFill(color, 1);
                 graphics.drawRect(0, 0, 25, 25);
                 graphics.endFill();
                 square.addChild(graphics);
-=======
-            let highlightedSquare = null;
-
-            function createSquare (x, z, highlight = false, type = "default") {
-                const square = new PIXI.Container();
-                square.x = x * 25;
-                square.y = z * 25;
-                square.interactive = true;
-                square.on('pointerdown', () => {
-                    displayInfo(x, z);
-                    highlightItem(x, z, false, type);
-                });
 
                 let imageUrl = '';
                 switch (type) {
@@ -366,12 +329,14 @@ html(lang="en")
                     default:
                         imageUrl = '/images/thumbnail_icona-estanteria-2.png';
                 }
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
 
                 const image = new PIXI.Sprite.from(imageUrl);
                 image.width = 25;
                 image.height = 25;
+                image.visible = !highlight; // La imagen no es visible si está resaltado
+                square.image = image; // Guardar la imagen para referencia futura
                 square.addChild(image);
+                
 
                 if (highlight) {
                     const highlightOverlay = new PIXI.Graphics();
@@ -382,76 +347,54 @@ html(lang="en")
                     square.addChild(highlightOverlay);
                 }
 
-                const image = new PIXI.Sprite.from('/images/thumbnail_icona-estanteria-2.png');
-                image.width = 25;
-                image.height = 25;
-                image.visible = !highlight; // La imagen no es visible si está resaltado
-                square.image = image; // Guardar la imagen para referencia futura
-                square.addChild(image);
-
                 return square;
             }
-<<<<<<< HEAD
             
             const warehouseData = !{JSON.stringify(warehouse)};
-            console.log(warehouseData);
+            //console.log(warehouseData);
             function createTiles() {
-                // Locations
-               if (Array.isArray(warehouseData)) {
-                warehouseData.forEach((item) => {
-                    // Verificar si el item es una ubicación (typeId === 6)
-                    if (item.typeId !== null) {
-                        // Verificar si el item tiene status
-                        let statusIds = [];
-                        if (item.status && Array.isArray(item.status)) {
-                            statusIds = item.status.map(status => status.id);
-                        } else if (item.status && typeof item.status === 'object') {
-                            // Si item.status no es un arreglo pero es un objeto, supongamos que tiene un id
-                            statusIds = [item.status.id];
+                // Verificar si warehouseData es un arreglo
+                if (Array.isArray(warehouseData)) {
+                    warehouseData.forEach((item) => {
+                        // Verificar si el item es una ubicación (typeId === 6)
+                        if (item.typeId !== null) {
+                            // Verificar si el item tiene status
+                            let statusIds = [];
+                            if (item.status && Array.isArray(item.status)) {
+                                statusIds = item.status.map(status => status.id);
+                            } else if (item.status && typeof item.status === 'object') {
+                                // Si item.status no es un arreglo pero es un objeto, supongamos que tiene un id
+                                statusIds = [item.status.id];
+                            }
+                            //console.log(statusIds); // Verificar los statusIds
+                            const square = createSquare(item.x, item.z, false, 0xffffff, item.id, statusIds);
+                            mapContainer.addChild(square);
                         }
-                        //console.log(statusIds); // Verificar los statusIds
-                        const square = createSquare(item.x, item.z, false, 0xffffff, item.id, statusIds);
-=======
-
-
-
-            function createTiles () {
-                transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
-                    locationGroup.locations.forEach((location) => {
-                        const square = createSquare(location.x, location.z, false, 'Location');
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
-                        mapContainer.addChild(square);
-                    }
-                });
-<<<<<<< HEAD
-               }
+                    });
+                }
+            
                 // Users
-=======
-
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 const users = transformedData.filter(item => item.placeTypeCode === "User");
                 users.forEach((user) => {
                     const square = createSquare(user.x, user.z, false, 'User');
                     mapContainer.addChild(square);
                 });
 
-                transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
+                // Docks
+                const docks = transformedData.filter(item => item.placeTypeCode === "Dock");
+                docks.forEach((dock) => {
                     const square = createSquare(dock.x, dock.z, false, 'Dock');
                     mapContainer.addChild(square);
                 });
 
-<<<<<<< HEAD
                 // Buffers
-=======
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
-                transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
+                const buffers = transformedData.filter(item => item.placeTypeCode === "Buffer");
+                buffers.forEach((buffer) => {
                     const square = createSquare(buffer.x, buffer.z, false, 'Buffer');
                     mapContainer.addChild(square);
                 });
             }
 
-
-<<<<<<< HEAD
 
             function transformData(data) {
                 return data.map(item => {
@@ -483,13 +426,11 @@ html(lang="en")
 
                 // Restaurar las ubicaciones resaltadas previamente
                 currentHighlights.forEach(location => {
-                    // Eliminar la superposición de resaltado
                     location.children.forEach(child => {
                         if (child.isHighlightOverlay) {
                             location.removeChild(child);
                         }
                     });
-                    // Restaurar la imagen original
                     if (location.image) {
                         location.image.visible = true;
                     }
@@ -576,15 +517,12 @@ html(lang="en")
                 stateCount.textContent = `Count: ${locationsInState.length}`;
             }
 
-            // Listener para cambios en la selección del estado
             document.getElementById('state-selector').addEventListener('change', highlightLocationsByState);
+
 
             
 
             function isUser (x, z) {
-=======
-            function isUser(x, z) {
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "User" && item.x === x && item.z === z) {
                         return true;
@@ -648,11 +586,8 @@ html(lang="en")
 
             function displayUserInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
-<<<<<<< HEAD
                 const userDetails = document.getElementById('user-details');
-=======
                 locationDetails.style.display = 'block';
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 locationDetails.innerHTML = '';
                 userDetails.innerHTML = '';
 
@@ -827,13 +762,9 @@ html(lang="en")
                 }
             }
 
-<<<<<<< HEAD
 
 
             function displayLocationInfo (x, z) {
-=======
-            function displayLocationInfo(x, z) {
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 const locationDetails = document.getElementById('location-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
@@ -1152,17 +1083,6 @@ html(lang="en")
                 });
             };
 
-<<<<<<< HEAD
-            function highlightItem(x, z) {
-                removeHighlightAtPosition(x, z);
- 
-                const highlightColor = 0xffeb3b;
-                const square = createSquare(x, z, true, highlightColor);
-                mapContainer.addChild(square);
-                viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
-
-                currentHighlights.push(square);
-=======
             function highlightItem (x, z, center = false, type = 'default') {
                 if (highlightedSquare) {
                     mapContainer.removeChild(highlightedSquare);
@@ -1191,7 +1111,6 @@ html(lang="en")
                     default:
                         return 'default';
                 }
->>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
             }
 
             function removeHighlightAtPosition(x, z) {

@@ -7,10 +7,11 @@ const users = require('../data/users.json');
 const productsData = require('../data/products.json');
 const stocksData = require('../data/stocks.json');
 const placeStatusTypesData = require('../data/placeStatusTypes.json');
+const workload = require('../data/workload.json');
 
 router.get('/', function (req, res, next) {
     const transformedData = jsonConvert('WH', warehouse, users);
-    res.render('warehouseMap', { data: transformedData, productsData, stocksData, placeStatusTypesData, warehouse });
+    res.render('warehouseMap', { data: transformedData, productsData, stocksData, placeStatusTypesData, warehouse, workload });
 });
 
 module.exports = router;
