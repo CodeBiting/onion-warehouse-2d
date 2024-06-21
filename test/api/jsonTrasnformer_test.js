@@ -1,3 +1,6 @@
+/**
+ * mocha test/api/jsonTrasnformer_test.js
+ */ 
 const expect = require('chai').expect;
 const jsonConverter = require('../../api/jsonTrasnformer.js');
 const WAREHOUSE_3SHELF = require('../data/warehouse3Shelfs.json');
@@ -32,6 +35,24 @@ describe('Testing transformation of original WAREHOUSE_3SHELF to 2D map represen
         const userCodes = users.map(user => user.code);
         result.filter(item => item.typeId === 3).forEach(user => {
             expect(userCodes).to.include(user.code);
+        });
+    });
+
+    it('Should have valid status for all places', () => {
+        const warehouses = [WAREHOUSE_3SHELF];  // Assuming WAREHOUSE_3SHELF is an array of warehouse data
+        warehouses.forEach(warehouse => {
+            const result = jsonConverter.jsonConvert('WH', warehouse, users);
+            result.forEach(item => {
+                if (item.locations) {
+                    item.locations.forEach(location => {
+                        if (location.status) {
+                            location.status.forEach(status => {
+                                expect(status).to.have.property('id');
+                            });
+                        }
+                    });
+                }
+            });
         });
     });
 
@@ -193,6 +214,9 @@ describe('General tests for all warehouses', () => {
             });
         });
     });
+
+
+    
 
 });
 

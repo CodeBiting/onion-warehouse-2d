@@ -139,32 +139,36 @@ html(lang="en")
                 flex-wrap: wrap;
             }
 
-            #location-details {
-                max-height: 400px;
+           #location-details, #user-details {
+                display: inline-block; /* Para mostrar ambos contenedores en línea */
+                vertical-align: top;   /* Alinear ambos contenedores en la parte superior */
+                max-height: 500px;
                 overflow-y: auto;
                 border: 3px solid #ccc;
                 padding: 10px;
-                background-color: #fff;
-                margin-top: 20px;
-                display: none;
+                width: 60%;           /* Ajustar el ancho al contenido de la tabla */
             }
 
-            #location-details table {
+            #location-details {
+                margin-right: 10px;    /* Espacio entre los dos contenedores */
+            }
+
+            #location-details table, #user-details table {
                 width: 100%;
                 border-collapse: collapse;
             }
 
-            #location-details th, #location-details td {
+            #location-details th, #user-details th, #location-details td, #user-details td {
                 border: 1px solid #ddd;
                 padding: 8px;
-                text-align: left;
+                text-align: center;
             }
 
-            #location-details tr:nth-child(even) {
+            #location-details tr:nth-child(even), #user-details tr:nth-child(even) {
                 background-color: #f2f2f2;
             }
 
-            #location-details th {
+            #location-details th, #user-details th {
                 background-color: #4CAF50;
                 color: white;
             }
@@ -203,6 +207,13 @@ html(lang="en")
                 #autocomplete-container
                     input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
                     ul#autocomplete-results
+                    button(onclick="searchProduct()") Search
+
+                #state-selector-container
+                    select#state-selector
+                    button(onclick="highlightLocationsByState()") Highlight Locations
+                    span#state-count
+
                 #buttons
                     button(onclick="searchProduct()") Search
                     button#zoomIn Zoom In
@@ -229,13 +240,29 @@ html(lang="en")
                         div Users Task
                         canvas#usersTasksChart
 
-                #right-panel
+        #pixi-canvas-container
+            #location-details
+                table
+                    thead
+                        tr
+                            th Location Code
+                            th Parent Code
+                            th Position
+                            th Inside
+                    tbody
+            #titleInfo
+                h2 Details
+        #pixi-canvas-container
+            #user-details
+               
+                #right-panel  <!-- cambios de Leo -->
                     #pixi-canvas-container
 
         script.
-            const transformedData = !{JSON.stringify(data)};
+            const transformedData = transformData(!{JSON.stringify(data)});
             const products = !{JSON.stringify(productsData)};
             const stocks = !{JSON.stringify(stocksData)};
+            const placeStatusTypes = !{JSON.stringify(placeStatusTypesData)};
             const workload = !{JSON.stringify(workload)};
 
             console.log(transformedData);
@@ -268,15 +295,22 @@ html(lang="en")
 
             let highlightedSquare = null;
 
-            function createSquare (x, z, highlight = false, type = "default") {
+            function createSquare (x, z, highlight = false, type = "default" , color = 0xffffff, locationId = null, statusIds = []) {
                 const square = new PIXI.Container();
                 square.x = x * 25;
                 square.y = z * 25;
+                square.locationId = locationId;
+                square.statusIds = statusIds; 
                 square.interactive = true;
                 square.on('pointerdown', () => {
-                    displayInfo(x, z);
+                    displayInfo(x, z ,square);
                     highlightItem(x, z, false, type);
                 });
+                const graphics = new PIXI.Graphics();
+                graphics.beginFill(color, 1);
+                graphics.drawRect(0, 0, 25, 25);
+                graphics.endFill();
+                square.addChild(graphics);
 
                 let imageUrl = '';
                 switch (type) {
@@ -299,10 +333,14 @@ html(lang="en")
                 const image = new PIXI.Sprite.from(imageUrl);
                 image.width = 25;
                 image.height = 25;
+                image.visible = !highlight; // La imagen no es visible si está resaltado
+                square.image = image; // Guardar la imagen para referencia futura
                 square.addChild(image);
+                
 
                 if (highlight) {
                     const highlightOverlay = new PIXI.Graphics();
+                    highlightOverlay.isHighlightOverlay = true;
                     highlightOverlay.beginFill(0xffeb3b, 0.5);
                     highlightOverlay.drawRect(0, 0, 25, 25);
                     highlightOverlay.endFill();
@@ -311,36 +349,180 @@ html(lang="en")
 
                 return square;
             }
-
-
-
-            function createTiles () {
-                transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
-                    locationGroup.locations.forEach((location) => {
-                        const square = createSquare(location.x, location.z, false, 'Location');
-                        mapContainer.addChild(square);
+            
+            const warehouseData = !{JSON.stringify(warehouse)};
+            //console.log(warehouseData);
+            function createTiles() {
+                // Verificar si warehouseData es un arreglo
+                if (Array.isArray(warehouseData)) {
+                    warehouseData.forEach((item) => {
+                        // Verificar si el item es una ubicación (typeId === 6)
+                        if (item.typeId !== null) {
+                            // Verificar si el item tiene status
+                            let statusIds = [];
+                            if (item.status && Array.isArray(item.status)) {
+                                statusIds = item.status.map(status => status.id);
+                            } else if (item.status && typeof item.status === 'object') {
+                                // Si item.status no es un arreglo pero es un objeto, supongamos que tiene un id
+                                statusIds = [item.status.id];
+                            }
+                            //console.log(statusIds); // Verificar los statusIds
+                            const square = createSquare(item.x, item.z, false, 0xffffff, item.id, statusIds);
+                            mapContainer.addChild(square);
+                        }
                     });
-                });
-
+                }
+            
+                // Users
                 const users = transformedData.filter(item => item.placeTypeCode === "User");
                 users.forEach((user) => {
                     const square = createSquare(user.x, user.z, false, 'User');
                     mapContainer.addChild(square);
                 });
 
-                transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
+                // Docks
+                const docks = transformedData.filter(item => item.placeTypeCode === "Dock");
+                docks.forEach((dock) => {
                     const square = createSquare(dock.x, dock.z, false, 'Dock');
                     mapContainer.addChild(square);
                 });
 
-                transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
+                // Buffers
+                const buffers = transformedData.filter(item => item.placeTypeCode === "Buffer");
+                buffers.forEach((buffer) => {
                     const square = createSquare(buffer.x, buffer.z, false, 'Buffer');
                     mapContainer.addChild(square);
                 });
             }
 
 
-            function isUser(x, z) {
+            function transformData(data) {
+                return data.map(item => {
+                    if (Array.isArray(item.status)) {
+                        item.statusIds = item.status.map(status => status.id);
+                    } else {
+                        item.statusIds = [];
+                    }
+                    delete item.status;
+                    return item;
+                });
+            }
+
+            
+            let currentMiniPanels = [];
+            let currentHighlights = [];
+
+            function highlightLocationsByState() {
+                const stateSelector = document.getElementById('state-selector');
+                const state = parseInt(stateSelector.value);
+                const stateCode = stateSelector.options[stateSelector.selectedIndex].text;
+                const locationsInState = [];
+
+                // Eliminar todos los mini paneles existentes
+                currentMiniPanels.forEach(panel => {
+                    mapContainer.removeChild(panel);
+                });
+                currentMiniPanels = [];
+
+                // Restaurar las ubicaciones resaltadas previamente
+                currentHighlights.forEach(location => {
+                    location.children.forEach(child => {
+                        if (child.isHighlightOverlay) {
+                            location.removeChild(child);
+                        }
+                    });
+                    if (location.image) {
+                        location.image.visible = true;
+                    }
+                });
+                currentHighlights = [];
+
+                function isOverlapping(newPanel, existingPanels) {
+                    const newPanelBounds = newPanel.getBounds();
+                    for (let panel of existingPanels) {
+                        const panelBounds = panel.getBounds();
+                        const overlap = !(newPanelBounds.right < panelBounds.left ||
+                            newPanelBounds.left > panelBounds.right ||
+                            newPanelBounds.bottom < panelBounds.top ||
+                            newPanelBounds.top > panelBounds.bottom);
+                        if (overlap) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+
+                function findNonOverlappingPosition(panel, existingPanels) {
+                    let offset = 55;
+                    while (isOverlapping(panel, existingPanels)) {
+                        panel.position.y -= offset;
+                        offset += 55;
+                    }
+                }
+
+                // Resaltar y mostrar información para ubicaciones con el estado seleccionado
+                mapContainer.children.forEach(child => {
+                    if (child.statusIds) {
+                        const isStatePresent = child.statusIds.includes(state);
+                        if (isStatePresent) {
+                            // Resaltar superposición
+                            const highlightOverlay = new PIXI.Graphics();
+                            highlightOverlay.isHighlightOverlay = true;
+                            highlightOverlay.beginFill(0xffeb3b, 0.5);
+                            highlightOverlay.drawRect(0, 0, child.width, child.height);
+                            highlightOverlay.endFill();
+                            child.addChild(highlightOverlay);
+
+                            // Mini panel con información de la ubicación
+                            const miniPanel = new PIXI.Container();
+                            const panelBackground = new PIXI.Graphics();
+                            panelBackground.beginFill(0x000000, 0.7);
+                            panelBackground.drawRect(0, 0, 100, 50);
+                            panelBackground.endFill();
+                            miniPanel.addChild(panelBackground);
+
+                            const textStyle = new PIXI.TextStyle({
+                                fontSize: 12,
+                                fill: '#ffffff'
+                            });
+                            const locationInfo = new PIXI.Text(`Location: ${child.locationId}\nStatus: ${stateCode}`, textStyle);
+                            locationInfo.position.set(5, 5);
+                            miniPanel.addChild(locationInfo);
+                             // Ajustar la posición vertical de los miniPanel
+                            let offsetY = 55;
+                            currentMiniPanels.forEach(panel => {
+                                offsetY += 55; // Espacio fijo de 55 unidades
+                            });
+                            miniPanel.position.set(child.x, child.y - offsetY);
+                            
+                            findNonOverlappingPosition(miniPanel, currentMiniPanels);
+
+                            mapContainer.addChild(miniPanel); // Añadir el mini panel al contenedor del mapa
+                            currentMiniPanels.push(miniPanel);  // Almacenar la referencia del mini panel
+                            locationsInState.push(child);
+                            console.log(child.x,child.y);
+                            highlightItem(child.x/25,child.y - (child.y-1));
+
+                            // Ocultar la imagen si está disponible
+                            if (child.image) {
+                                child.image.visible = false;
+                            }
+                            currentHighlights.push(child);
+                        }
+                    }
+                });
+
+                // Actualizar el contador de estado
+                const stateCount = document.getElementById('state-count');
+                stateCount.textContent = `Count: ${locationsInState.length}`;
+            }
+
+            document.getElementById('state-selector').addEventListener('change', highlightLocationsByState);
+
+
+            
+
+            function isUser (x, z) {
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "User" && item.x === x && item.z === z) {
                         return true;
@@ -404,16 +586,19 @@ html(lang="en")
 
             function displayUserInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
+                const userDetails = document.getElementById('user-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
+                userDetails.innerHTML = '';
 
                 const user = transformedData.find(item => item.placeTypeCode === "User" && item.x === x && item.z === z);
 
                 if (user) {
-                    const table = document.createElement('table');
-                    const thead = document.createElement('thead');
-                    const tbody = document.createElement('tbody');
-                    const trHead = document.createElement('tr');
+                    // Crear la tabla para la información del usuario
+                    const userTable = document.createElement('table');
+                    const userThead = document.createElement('thead');
+                    const userTbody = document.createElement('tbody');
+                    const userTrHead = document.createElement('tr');
 
                     const thId = document.createElement('th');
                     thId.textContent = 'User ID';
@@ -426,16 +611,16 @@ html(lang="en")
                     const thPosition = document.createElement('th');
                     thPosition.textContent = 'Position';
 
-                    trHead.appendChild(thId);
-                    trHead.appendChild(thCode);
-                    trHead.appendChild(thName);
-                    trHead.appendChild(thSurname);
-                    trHead.appendChild(thPosition);
-                    thead.appendChild(trHead);
-                    table.appendChild(thead);
-                    table.appendChild(tbody);
+                    userTrHead.appendChild(thId);
+                    userTrHead.appendChild(thCode);
+                    userTrHead.appendChild(thName);
+                    userTrHead.appendChild(thSurname);
+                    userTrHead.appendChild(thPosition);
+                    userThead.appendChild(userTrHead);
+                    userTable.appendChild(userThead);
+                    userTable.appendChild(userTbody);
 
-                    const trBody = document.createElement('tr');
+                    const userTrBody = document.createElement('tr');
 
                     const tdId = document.createElement('td');
                     tdId.textContent = user.id;
@@ -448,23 +633,23 @@ html(lang="en")
                     const tdPosition = document.createElement('td');
                     tdPosition.textContent = `| x = ${user.x} | y = ${user.y || 0} | z = ${user.z} |`;
 
-                    trBody.appendChild(tdId);
-                    trBody.appendChild(tdCode);
-                    trBody.appendChild(tdName);
-                    trBody.appendChild(tdSurname);
-                    trBody.appendChild(tdPosition);
-                    tbody.appendChild(trBody);
+                    userTrBody.appendChild(tdId);
+                    userTrBody.appendChild(tdCode);
+                    userTrBody.appendChild(tdName);
+                    userTrBody.appendChild(tdSurname);
+                    userTrBody.appendChild(tdPosition);
+                    userTbody.appendChild(userTrBody);
 
                     // Carried Places
                     if (user.carriedPlaces && user.carriedPlaces.length > 0) {
                         const carriedPlacesHeader = document.createElement('tr');
                         carriedPlacesHeader.innerHTML = `<th colspan="5">Carried Places</th>`;
-                        tbody.appendChild(carriedPlacesHeader);
+                        userTbody.appendChild(carriedPlacesHeader);
 
                         user.carriedPlaces.forEach(place => {
                             const trPlace = document.createElement('tr');
                             trPlace.innerHTML = `<td colspan="2">Code: ${place.code}</td><td colspan="3">Weight: ${place.weight}</td>`;
-                            tbody.appendChild(trPlace);
+                            userTbody.appendChild(trPlace);
                         });
                     }
 
@@ -472,12 +657,12 @@ html(lang="en")
                     if (user.carriedStocks && user.carriedStocks.length > 0) {
                         const carriedStocksHeader = document.createElement('tr');
                         carriedStocksHeader.innerHTML = `<th colspan="5">Carried Stocks</th>`;
-                        tbody.appendChild(carriedStocksHeader);
+                        userTbody.appendChild(carriedStocksHeader);
 
                         user.carriedStocks.forEach(stock => {
                             const trStock = document.createElement('tr');
                             trStock.innerHTML = `<td colspan="2">Code: ${stock.code}</td><td colspan="3">Quantity: ${stock.quantity}</td>`;
-                            tbody.appendChild(trStock);
+                            userTbody.appendChild(trStock);
                         });
                     }
 
@@ -485,22 +670,101 @@ html(lang="en")
                     if (user.orders && user.orders.length > 0) {
                         const ordersHeader = document.createElement('tr');
                         ordersHeader.innerHTML = `<th colspan="5">Orders</th>`;
-                        tbody.appendChild(ordersHeader);
+                        userTbody.appendChild(ordersHeader);
 
                         user.orders.forEach(order => {
                             const trOrder = document.createElement('tr');
-                            trOrder.innerHTML = `<td colspan="2">Code: ${order.code}</td><td colspan="3">Task Movements: ${order.taskmovements}</td>`;
-                            tbody.appendChild(trOrder);
+                            trOrder.innerHTML = `
+                                <td colspan="2">Code: ${order.code}</td>
+                                <td colspan="3">Task Movements: ${order.taskmovements}</td>
+                            `;
+                            userTbody.appendChild(trOrder);
                         });
                     }
 
-                    locationDetails.appendChild(table);
+                    locationDetails.appendChild(userTable);
+
+                    // Crear la tabla para el movimiento actual
+                    const movementTable = document.createElement('table');
+                    const movementThead = document.createElement('thead');
+                    const movementTbody = document.createElement('tbody');
+                    const movementTrHead = document.createElement('tr');
+
+                    const thMovementId = document.createElement('th');
+                    thMovementId.textContent = 'Movement ID';
+                    const thPlaceFrom = document.createElement('th');
+                    thPlaceFrom.textContent = 'Place From';
+                    const thPlaceTo = document.createElement('th');
+                    thPlaceTo.textContent = 'Place To';
+                    const thProductCode = document.createElement('th');
+                    thProductCode.textContent = 'Product Code';
+                    const thProductDescription = document.createElement('th');
+                    thProductDescription.textContent = 'Product Description';
+                    const thQuantityToPick = document.createElement('th');
+                    thQuantityToPick.textContent = 'Quantity to Pick';
+                    const thConversionToPick = document.createElement('th');
+                    thConversionToPick.textContent = 'Conversion to Pick';
+                    const thOrder = document.createElement('th');
+                    thOrder.textContent = 'Order';
+                    const thClient = document.createElement('th');
+                    thClient.textContent = 'Client';
+                    const thTasksPending = document.createElement('th');
+                    thTasksPending.textContent = 'Tasks Pending';
+                    const thTasksDone = document.createElement('th');
+                    thTasksDone.textContent = 'Tasks Done';
+
+                    movementTrHead.appendChild(thMovementId);
+                    movementTrHead.appendChild(thPlaceFrom);
+                    movementTrHead.appendChild(thPlaceTo);
+                    movementTrHead.appendChild(thProductCode);
+                    movementTrHead.appendChild(thProductDescription);
+                    movementTrHead.appendChild(thQuantityToPick);
+                    movementTrHead.appendChild(thConversionToPick);
+                    movementTrHead.appendChild(thOrder);
+                    movementTrHead.appendChild(thClient);
+                    movementTrHead.appendChild(thTasksPending);
+                    movementTrHead.appendChild(thTasksDone);
+                    movementThead.appendChild(movementTrHead);
+                    movementTable.appendChild(movementThead);
+                    movementTable.appendChild(movementTbody);
+
+                    let hasTaskmovement = false;
+                    user.orders.forEach(order => {
+                        // Current Movement
+                        if (order.currentTaskmovement) {
+                            hasTaskmovement = true;
+                            const movement = order.currentTaskmovement;
+                            const trMovement = document.createElement('tr');
+                            trMovement.innerHTML = `
+                                <td>${movement.id}</td>
+                                <td>${movement.placeFrom.code}</td>
+                                <td>${movement.placeTo.code}</td>
+                                <td>${movement.code}</td>
+                                <td>${movement.description}</td>
+                                <td>${movement.quantity}</td>
+                                <td>${movement.conversion.quantity} ${movement.conversion.code}</td>
+                                <td>${order.code}</td>
+                                <td>${order.client.name}</td>
+                                <td>${order.taskmovementsPending}</td>
+                                <td>${order.taskmovementsDone}</td>
+                            `;
+                            movementTbody.appendChild(trMovement);
+                        }
+                    });
+
+                     if (hasTaskmovement) {
+                        userDetails.appendChild(movementTable);
+                    } else {
+                        userDetails.innerHTML = ''; 
+                    }
                 } else {
                     console.log("User not found.");
                 }
             }
 
-            function displayLocationInfo(x, z) {
+
+
+            function displayLocationInfo (x, z) {
                 const locationDetails = document.getElementById('location-details');
                 locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
@@ -849,11 +1113,29 @@ html(lang="en")
                 }
             }
 
+            function removeHighlightAtPosition(x, z) {
+                currentHighlights.forEach((highlight, index) => {
+                    if (highlight.x === x * 25 && highlight.y === z * 25) {
+                        mapContainer.removeChild(highlight);
+                        currentHighlights.splice(index, 1);
+                    }
+                });
+            }
+
+
             document.addEventListener('click', function (event) {
                 const autocompleteList = document.getElementById('autocomplete-results');
                 if (!event.target.matches('#productCode')) {
                     autocompleteList.innerHTML = '';
                 }
+            });
+
+            const stateSelector = document.getElementById('state-selector');
+            placeStatusTypes.forEach(status => {
+                const option = document.createElement('option');
+                option.value = status.id;
+                option.textContent = status.code;
+                stateSelector.appendChild(option);
             });
 
             createTiles();

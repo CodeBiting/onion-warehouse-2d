@@ -12,7 +12,12 @@
     "parentId": "NULL",
     "numPicking": 0,
     "avgPickingSeconds": 0,
-    "status": [ ]
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1002,
@@ -50,7 +55,17 @@
     "allowStock": 1,
     "parentId": 1002,
     "numPicking": 5,
-    "avgPickingSeconds": 224.377
+    "avgPickingSeconds": 224.377,
+    "status": [
+      {
+        "id": 2,
+        "code": "Freeze"
+      },
+      {
+        "id": 3,
+        "code": "Quarantine"
+      }
+    ]
   },
   {
     "id": 1278,
@@ -260,7 +275,13 @@
     "allowStock": 1,
     "parentId": 5078,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1138,
@@ -274,7 +295,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1166,
@@ -288,7 +315,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1194,
@@ -302,7 +335,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1222,
@@ -316,7 +355,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1250,
@@ -330,7 +375,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1139,
@@ -344,7 +395,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1167,
@@ -358,7 +415,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1195,
@@ -372,7 +435,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1223,
@@ -386,7 +455,13 @@
     "allowStock": 1,
     "parentId": 1137,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 1,
+        "code": "Available"
+      }
+    ]
   },
   {
     "id": 1251,
@@ -19720,7 +19795,13 @@
     "allowStock": 1,
     "parentId": 2424,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 8,
+        "code": "ContainerClosed"
+      }
+    ]
   },
   {
     "id": 2447,
@@ -19734,7 +19815,13 @@
     "allowStock": 1,
     "parentId": 2424,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 8,
+        "code": "ContainerClosed"
+      }
+    ]
   },
   {
     "id": 2495,
@@ -19748,7 +19835,13 @@
     "allowStock": 1,
     "parentId": 2424,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 8,
+        "code": "ContainerClosed"
+      }
+    ]
   },
   {
     "id": 2543,
@@ -19762,7 +19855,13 @@
     "allowStock": 1,
     "parentId": 2424,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 8,
+        "code": "ContainerClosed"
+      }
+    ]
   },
   {
     "id": 2591,
@@ -27686,7 +27785,13 @@
     "allowStock": 1,
     "parentId": 2921,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 7,
+        "code": "FabricationOutbound"
+      }
+    ]
   },
   {
     "id": 3174,
@@ -27700,7 +27805,13 @@
     "allowStock": 1,
     "parentId": 2921,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 7,
+        "code": "FabricationOutbound"
+      }
+    ]
   },
   {
     "id": 2959,
@@ -27714,7 +27825,13 @@
     "allowStock": 1,
     "parentId": 2921,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 7,
+        "code": "FabricationOutbound"
+      }
+    ]
   },
   {
     "id": 3013,
@@ -27728,7 +27845,13 @@
     "allowStock": 1,
     "parentId": 2921,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 7,
+        "code": "FabricationOutbound"
+      }
+    ]
   },
   {
     "id": 3067,
@@ -30822,7 +30945,13 @@
     "allowStock": 1,
     "parentId": 3192,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 6,
+        "code": "FabricationInbound"
+      }
+    ]
   },
   {
     "id": 3391,
@@ -30836,7 +30965,13 @@
     "allowStock": 1,
     "parentId": 3192,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 6,
+        "code": "FabricationInbound"
+      }
+    ]
   },
   {
     "id": 3448,
@@ -30850,7 +30985,13 @@
     "allowStock": 1,
     "parentId": 3192,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 6,
+        "code": "FabricationInbound"
+      }
+    ]
   },
   {
     "id": 3221,
@@ -30864,7 +31005,13 @@
     "allowStock": 1,
     "parentId": 3192,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 6,
+        "code": "FabricationInbound"
+      }
+    ]
   },
   {
     "id": 3278,
@@ -30878,7 +31025,13 @@
     "allowStock": 1,
     "parentId": 3192,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 6,
+        "code": "FabricationInbound"
+      }
+    ]
   },
   {
     "id": 3335,
@@ -40398,7 +40551,13 @@
     "allowStock": 1,
     "parentId": 3764,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 5,
+        "code": "PickingStockOnly"
+      }
+    ]
   },
   {
     "id": 3929,
@@ -40412,7 +40571,13 @@
     "allowStock": 1,
     "parentId": 3764,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 5,
+        "code": "PickingStockOnly"
+      }
+    ]
   },
   {
     "id": 3986,
@@ -40426,7 +40591,13 @@
     "allowStock": 1,
     "parentId": 3764,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 5,
+        "code": "PickingStockOnly"
+      }
+    ]
   },
   {
     "id": 4043,
@@ -40440,7 +40611,13 @@
     "allowStock": 1,
     "parentId": 3764,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 5,
+        "code": "PickingStockOnly"
+      }
+    ]
   },
   {
     "id": 3816,
@@ -40454,7 +40631,13 @@
     "allowStock": 1,
     "parentId": 3764,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 5,
+        "code": "PickingStockOnly"
+      }
+    ]
   },
   {
     "id": 3873,
@@ -40468,7 +40651,13 @@
     "allowStock": 1,
     "parentId": 3764,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 5,
+        "code": "PickingStockOnly"
+      }
+    ]
   },
   {
     "id": 3930,
@@ -45718,7 +45907,13 @@
     "allowStock": 1,
     "parentId": 4331,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 3,
+        "code": "Quarantine"
+      }
+    ]
   },
   {
     "id": 4393,
@@ -45732,7 +45927,13 @@
     "allowStock": 1,
     "parentId": 4331,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 3,
+        "code": "Quarantine"
+      }
+    ]
   },
   {
     "id": 4417,
@@ -45760,7 +45961,13 @@
     "allowStock": 1,
     "parentId": 4331,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 4,
+        "code": "PickingPlaceOnly"
+      }
+    ]
   },
   {
     "id": 4346,
@@ -45774,7 +45981,13 @@
     "allowStock": 1,
     "parentId": 4331,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 4,
+        "code": "PickingPlaceOnly"
+      }
+    ]
   },
   {
     "id": 4370,
@@ -45788,7 +46001,13 @@
     "allowStock": 1,
     "parentId": 4331,
     "numPicking": 0,
-    "avgPickingSeconds": 0
+    "avgPickingSeconds": 0,
+    "status": [
+      {
+        "id": 4,
+        "code": "PickingPlaceOnly"
+      }
+    ]
   },
   {
     "id": 4394,
