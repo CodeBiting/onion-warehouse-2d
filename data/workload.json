@@ -1,0 +1,69 @@
+{
+    "orderTotals": [
+        {
+          "typeCode": "100",
+          "statusCode": "STANDBY",
+          "numOrders": 1
+        },
+        {
+          "typeCode": "CORDER",
+          "statusCode": "ALIVE",
+          "numOrders": 1
+        },
+        {
+          "typeCode": "CRETURN",
+          "statusCode": "STANDBY",
+          "numOrders": 1
+        },
+        {
+          "typeCode": "PORDER",
+          "statusCode": "STANDBY",
+          "numOrders": 2
+        },
+        {
+          "typeCode": "RECEPTION",
+          "statusCode": "STANDBY",
+          "numOrders": 1
+        }
+    ],
+    "timeToFinishTotals": [
+        {
+          "totalEstimatedPrepareTime": 0,
+          "totalCalculatedPrepareTime": 0
+        }
+    ],
+    "taskTotals": [
+        {
+          "code": "Pick",
+          "code__1": "Generated",
+          "numTasks": 3
+        },
+        {
+          "code": "Putaway-Stock",
+          "code__1": "Generated",
+          "numTasks": 1
+        }
+    ],
+    "taskTotalsByUser": [
+        {
+          "code": "agusti",
+          "taskTypeCode": "NULL",
+          "numTasks": 0
+        },
+        {
+          "code": "system",
+          "taskTypeCode": "NULL",
+          "numTasks": 0
+        },
+        {
+          "code": "u1",
+          "taskTypeCode": "Putaway-Stock",
+          "numTasks": 1
+        },
+        {
+          "code": "u1",
+          "taskTypeCode": "Pick",
+          "numTasks": 3
+        }
+    ]
+}

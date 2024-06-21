@@ -5,23 +5,112 @@ html(lang="en")
         title 2D Map with Pixi.js
         script(src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/6.5.4/browser/pixi.min.js" integrity="sha512-MLJM72M8frjnFXEvWn3NaVkrSxlDnbRK/Iwyr7loPca+13SdS9B5sNLHoIkDxfPOndP8WReNdwGLxisYUapc7A==" crossorigin="anonymous" referrerpolicy="no-referrer")
         script(src="https://cdn.jsdelivr.net/npm/pixi-viewport@4.30.0/dist/viewport.min.js")
+        script(src="https://cdn.jsdelivr.net/npm/chart.js")
+        script(src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels")
+
         style.
-            #autocomplete-container {
-                position: relative;
-                width: 40%;
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                font-family: Arial, sans-serif;
+                background-color: #f0f0f0;
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                box-sizing: border-box;
             }
 
-            #buttons {
+            #header {
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            #main-container {
                 display: flex;
-                justify-content: flex-end;
-                width: 70%;
-                margin-left: 3%;
+                flex-direction: column;
+                gap: 20px;
+                width: 90%;
+                margin-top: 20px;
+                flex: 1;
+            }
+
+            #charts-container {
+                display: flex;
+                flex-direction: row;
+                gap: 10px;
+                align-items: flex-start;
+                justify-content: center;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .chart-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                flex: 1;
+                max-width: 30%;
+                height: 200px;
+            }
+
+            .chart-container div {
+                margin-bottom: 5px;
+                font-size: 1em;
+                font-weight: bold;
+            }
+
+            .chart-container canvas {
+                width: 100%;
+                height: auto;
+            }
+
+            @media (min-width: 768px) {
+                #main-container {
+                    flex-direction: row;
+                }
+
+                #left-panel {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    flex: 1;
+                    position: relative;
+                }
+
+                #right-panel {
+                    flex: 2;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+            }
+
+            #left-panel {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                flex: 1;
+                position: relative;
+            }
+
+            #right-panel {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+            }
+
+            #autocomplete-container {
+                position: relative;
+                width: 100%;
             }
 
             #autocomplete-results {
                 position: absolute;
-                width: 300px;
-                top: 100%;
+                width: 100%;
+                top: 35px;
                 left: 0;
                 right: 0;
                 z-index: 1000;
@@ -43,22 +132,14 @@ html(lang="en")
                 background-color: #f0f0f0;
             }
 
-            body {
+            #buttons {
                 display: flex;
-                flex-direction: column;
                 gap: 10px;
+                margin-top: 15px;
+                flex-wrap: wrap;
             }
 
-            canvas {
-                width: 69%;
-            }
-
-            #product-interaction-section {
-                display: flex;
-                align-items: center;
-                width: 68%;
-            }
-
+<<<<<<< HEAD
            #location-details, #user-details {
                 display: inline-block; /* Para mostrar ambos contenedores en línea */
                 vertical-align: top;   /* Alinear ambos contenedores en la parte superior */
@@ -74,6 +155,19 @@ html(lang="en")
             }
 
             #location-details table, #user-details table {
+=======
+            #location-details {
+                max-height: 400px;
+                overflow-y: auto;
+                border: 3px solid #ccc;
+                padding: 10px;
+                background-color: #fff;
+                margin-top: 20px;
+                display: none;
+            }
+
+            #location-details table {
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 width: 100%;
                 border-collapse: collapse;
             }
@@ -88,40 +182,50 @@ html(lang="en")
                 background-color: #f2f2f2;
             }
 
+<<<<<<< HEAD
             #location-details th, #user-details th {
+=======
+            #location-details th {
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 background-color: #4CAF50;
                 color: white;
             }
+
             #pixi-canvas-container {
                 display: flex;
-                flex-direction: column-reverse;
-                gap: 5%;
-            }
-            #title{
-                display: flex;
-                justify-content: center;
-                margin-bottom: 20px;
+                flex-direction: column;
+                align-items: center;
+                width: 100%;
+                margin-top: 5%;
+                margin-bottom: 10%;
+                flex: 1;
             }
 
-            #titleInfo{
-                display: flex;
-                justify-content: center;
-                width: 32%;
-            }
-            #location-details-section{
-                display: flex;
+            canvas {
+                width: 100%;
                 height: auto;
+                max-width: 800px;
+                max-height: 500px;
+                transition: width 0.5s, height 0.5s;
+            }
+
+            #container-right-panel {
+                display: flex;
+                flex-direction: column;
+                flex: 2;
             }
 
 
     body
-        #title
+        #header
             h1 Warehouse Map
-        #location-details-section
-            #product-interaction-section
+
+        #main-container
+            #left-panel
                 #autocomplete-container
                     input(type="text" id="productCode" placeholder="Enter product code" oninput="autocompleteSearch()")
                     ul#autocomplete-results
+<<<<<<< HEAD
                     button(onclick="searchProduct()") Search
 
                 #state-selector-container
@@ -129,11 +233,35 @@ html(lang="en")
                     button(onclick="highlightLocationsByState()") Highlight Locations
                     span#state-count
 
+=======
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 #buttons
+                    button(onclick="searchProduct()") Search
                     button#zoomIn Zoom In
                     button#zoomOut Zoom Out
+                #location-details
+                    table
+                        thead
+                            tr
+                                th Location Code
+                                th Parent Code
+                                th Position
+                                th Inside
+                        tbody
 
+            #container-right-panel
+                #charts-container
+                    .chart-container
+                        div Orders
+                        canvas#ordersChart
+                    .chart-container
+                        div Tasks
+                        canvas#tasksChart
+                    .chart-container
+                        div Users Task
+                        canvas#usersTasksChart
 
+<<<<<<< HEAD
         #pixi-canvas-container
             #location-details
                 table
@@ -149,16 +277,28 @@ html(lang="en")
         #pixi-canvas-container
             #user-details
                
+=======
+                #right-panel
+                    #pixi-canvas-container
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
 
         script.
             const transformedData = transformData(!{JSON.stringify(data)});
             const products = !{JSON.stringify(productsData)};
             const stocks = !{JSON.stringify(stocksData)};
+<<<<<<< HEAD
             const placeStatusTypes = !{JSON.stringify(placeStatusTypesData)};
             
+=======
+            const workload = !{JSON.stringify(workload)};
+
+            console.log(transformedData);
+            console.log(workload)
+
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
             const app = new PIXI.Application({
-                width: 1000,
-                height: 500,
+                width: 600,
+                height: 300,
                 backgroundColor: 0xffffff,
             });
             const canvasContainer = document.getElementById('pixi-canvas-container');
@@ -167,8 +307,8 @@ html(lang="en")
             app.view.style.border = '4px solid #000000';
 
             const viewport = new PIXI.Viewport({
-                screenWidth: 1000,
-                screenHeight: 500,
+                screenWidth: 600,
+                screenHeight: 300,
                 worldWidth: 1000,
                 worldHeight: 600,
                 interaction: app.renderer.plugins.interaction
@@ -181,6 +321,7 @@ html(lang="en")
             const mapContainer = new PIXI.Container();
             viewport.addChild(mapContainer);
 
+<<<<<<< HEAD
             function createSquare(x, z, highlight = false, color = 0xffffff, locationId = null, statusIds = []) {
                 const square = new PIXI.Container();
                 square.x = x * 25;
@@ -195,6 +336,42 @@ html(lang="en")
                 graphics.drawRect(0, 0, 25, 25);
                 graphics.endFill();
                 square.addChild(graphics);
+=======
+            let highlightedSquare = null;
+
+            function createSquare (x, z, highlight = false, type = "default") {
+                const square = new PIXI.Container();
+                square.x = x * 25;
+                square.y = z * 25;
+                square.interactive = true;
+                square.on('pointerdown', () => {
+                    displayInfo(x, z);
+                    highlightItem(x, z, false, type);
+                });
+
+                let imageUrl = '';
+                switch (type) {
+                    case 'User':
+                        imageUrl = '/images/thumbnail_icona-operari.png';
+                        break;
+                    case 'Dock':
+                        imageUrl = '/images/icona-door.png';
+                        break;
+                    case 'Buffer':
+                        imageUrl = '/images/thumbnail_icona-buffer.png';
+                        break;
+                    case 'Location':
+                        imageUrl = '/images/thumbnail_icona-estanteria-2.png';
+                        break;
+                    default:
+                        imageUrl = '/images/thumbnail_icona-estanteria-2.png';
+                }
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
+
+                const image = new PIXI.Sprite.from(imageUrl);
+                image.width = 25;
+                image.height = 25;
+                square.addChild(image);
 
                 if (highlight) {
                     const highlightOverlay = new PIXI.Graphics();
@@ -214,6 +391,7 @@ html(lang="en")
 
                 return square;
             }
+<<<<<<< HEAD
             
             const warehouseData = !{JSON.stringify(warehouse)};
             console.log(warehouseData);
@@ -233,35 +411,47 @@ html(lang="en")
                         }
                         //console.log(statusIds); // Verificar los statusIds
                         const square = createSquare(item.x, item.z, false, 0xffffff, item.id, statusIds);
+=======
+
+
+
+            function createTiles () {
+                transformedData.filter(item => item.typeId === 6).forEach((locationGroup) => {
+                    locationGroup.locations.forEach((location) => {
+                        const square = createSquare(location.x, location.z, false, 'Location');
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                         mapContainer.addChild(square);
                     }
                 });
+<<<<<<< HEAD
                }
                 // Users
+=======
+
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 const users = transformedData.filter(item => item.placeTypeCode === "User");
-                console.log('Users:', users);
                 users.forEach((user) => {
-                    const color = 0x00ff00;
-                    const square = createSquare(user.x, user.z, "user", color);
+                    const square = createSquare(user.x, user.z, false, 'User');
                     mapContainer.addChild(square);
                 });
 
-                // Docks
                 transformedData.filter(item => item.placeTypeCode === "Dock").forEach((dock) => {
-                    const color = 0xff0000;
-                    const square = createSquare(dock.x, dock.z, "dock", color);
+                    const square = createSquare(dock.x, dock.z, false, 'Dock');
                     mapContainer.addChild(square);
                 });
 
+<<<<<<< HEAD
                 // Buffers
+=======
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 transformedData.filter(item => item.placeTypeCode === "Buffer").forEach((buffer) => {
-                    const color = 0xff8000;
-                    const square = createSquare(buffer.x, buffer.z, "buffer", color);
+                    const square = createSquare(buffer.x, buffer.z, false, 'Buffer');
                     mapContainer.addChild(square);
                 });
             }
 
 
+<<<<<<< HEAD
 
             function transformData(data) {
                 return data.map(item => {
@@ -392,15 +582,18 @@ html(lang="en")
             
 
             function isUser (x, z) {
+=======
+            function isUser(x, z) {
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "User" && item.x === x && item.z === z) {
                         return true;
                     }
                 }
-
                 return false;
             }
-            function isLocation (x, z) {
+
+            function isLocation(x, z) {
                 for (const item of transformedData) {
                     if (Array.isArray(item.locations)) {
                         if (item.locations.some(location => location.x === x && location.z === z)) {
@@ -411,18 +604,16 @@ html(lang="en")
                 return false;
             }
 
-            function isBuffer (x, z) {
+            function isBuffer(x, z) {
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "Buffer" && item.x === x && item.z === z) {
                         return true;
                     }
                 }
-
                 return false;
             }
 
-            function isDock (x, z) {
-
+            function isDock(x, z) {
                 for (const item of transformedData) {
                     if (item.placeTypeCode === "Dock" && item.x === x && item.z === z) {
                         return true;
@@ -431,31 +622,37 @@ html(lang="en")
                 return false;
             }
 
-            function displayInfo (x, z) {
+            function displayInfo(x, z) {
                 const isUserSquare = isUser(x, z);
                 const isLocationSquare = isLocation(x, z);
+                const isBufferSquare = isBuffer(x, z);
+                const isDockSquare = isDock(x, z);
 
                 switch (true) {
                     case isUserSquare:
-                        elementType = "User";
                         displayUserInfo(x, z);
                         break;
                     case isLocationSquare:
-                        elementType = "Location";
                         displayLocationInfo(x, z);
                         break;
+                    case isBufferSquare:
+                        displayBufferInfo(x, z);
+                        break;
+                    case isDockSquare:
+                        displayDockInfo(x, z);
+                        break;
                     default:
-                        console.log("No information available for this square");
-                        return;
+                        console.log("No information available for this element.");
                 }
-
-                const titleInfo = document.getElementById('titleInfo');
-                titleInfo.querySelector('h2').textContent = `${elementType} Details`;
             }
 
             function displayUserInfo(x, z) {
                 const locationDetails = document.getElementById('location-details');
+<<<<<<< HEAD
                 const userDetails = document.getElementById('user-details');
+=======
+                locationDetails.style.display = 'block';
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 locationDetails.innerHTML = '';
                 userDetails.innerHTML = '';
 
@@ -630,10 +827,15 @@ html(lang="en")
                 }
             }
 
+<<<<<<< HEAD
 
 
             function displayLocationInfo (x, z) {
+=======
+            function displayLocationInfo(x, z) {
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
                 const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
                 locationDetails.innerHTML = '';
 
                 const table = document.createElement('table');
@@ -702,58 +904,212 @@ html(lang="en")
                 locationDetails.appendChild(table);
             }
 
+            function displayBufferInfo(x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
+                locationDetails.innerHTML = '';
 
+                const buffer = transformedData.find(item => item.placeTypeCode === "Buffer" && item.x === x && item.z === z);
 
-            function findStockByProductId (productId) {
+                if (buffer) {
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    const trHead = document.createElement('tr');
+
+                    const thLocationCode = document.createElement('th');
+                    thLocationCode.textContent = 'Buffer Code';
+                    const thParentCode = document.createElement('th');
+                    thParentCode.textContent = 'Parent Code';
+                    const thPosition = document.createElement('th');
+                    thPosition.textContent = 'Position';
+                    const thInside = document.createElement('th');
+                    thInside.textContent = 'Inside';
+
+                    trHead.appendChild(thLocationCode);
+                    trHead.appendChild(thParentCode);
+                    trHead.appendChild(thPosition);
+                    trHead.appendChild(thInside);
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    const trBody = document.createElement('tr');
+
+                    const tdLocationCode = document.createElement('td');
+                    tdLocationCode.textContent = buffer.code;
+                    const tdParentCode = document.createElement('td');
+                    const regex = /^[A-Za-z]\s*\d{6}$/;
+                    const isStandardFormat = regex.test(buffer.code.replace(/\s/g, ''));
+                    tdParentCode.textContent = isStandardFormat ? buffer.code.trim().charAt(0) : buffer.code;
+
+                    const tdPosition = document.createElement('td');
+                    tdPosition.textContent = `| x = ${buffer.x} | y = ${buffer.y || 0} | z = ${buffer.z} |`;
+
+                    const tdInside = document.createElement('td');
+                    const bufferStocks = stocks.filter(stock => stock.placeId === buffer.id);
+                    if (bufferStocks.length > 0) {
+                        bufferStocks.forEach(stock => {
+                            const product = products.find(product => product.id === stock.productId);
+                            if (product) {
+                                const productInfo = document.createElement('div');
+                                productInfo.textContent = `${product.name} = ${stock.quantity} Units`;
+                                tdInside.appendChild(productInfo);
+                            }
+                        });
+                    } else {
+                        tdInside.textContent = 'No products found.';
+                    }
+
+                    trBody.appendChild(tdLocationCode);
+                    trBody.appendChild(tdParentCode);
+                    trBody.appendChild(tdPosition);
+                    trBody.appendChild(tdInside);
+                    tbody.appendChild(trBody);
+
+                    locationDetails.appendChild(table);
+                } else {
+                    console.log("Buffer not found.");
+                }
+            }
+
+            function displayDockInfo(x, z) {
+                const locationDetails = document.getElementById('location-details');
+                locationDetails.style.display = 'block';
+                locationDetails.innerHTML = '';
+
+                const dock = transformedData.find(item => item.placeTypeCode === "Dock" && item.x === x && item.z === z);
+
+                if (dock) {
+                    const table = document.createElement('table');
+                    const thead = document.createElement('thead');
+                    const tbody = document.createElement('tbody');
+                    const trHead = document.createElement('tr');
+
+                    const thLocationCode = document.createElement('th');
+                    thLocationCode.textContent = 'Dock Code';
+                    const thParentCode = document.createElement('th');
+                    thParentCode.textContent = 'Parent Code';
+                    const thPosition = document.createElement('th');
+                    thPosition.textContent = 'Position';
+                    const thInside = document.createElement('th');
+                    thInside.textContent = 'Inside';
+
+                    trHead.appendChild(thLocationCode);
+                    trHead.appendChild(thParentCode);
+                    trHead.appendChild(thPosition);
+                    trHead.appendChild(thInside);
+                    thead.appendChild(trHead);
+                    table.appendChild(thead);
+                    table.appendChild(tbody);
+
+                    const trBody = document.createElement('tr');
+
+                    const tdLocationCode = document.createElement('td');
+                    tdLocationCode.textContent = dock.code;
+                    const tdParentCode = document.createElement('td');
+                    const regex = /^[A-Za-z]\s*\d{6}$/;
+                    const isStandardFormat = regex.test(dock.code.replace(/\s/g, ''));
+                    tdParentCode.textContent = isStandardFormat ? dock.code.trim().charAt(0) : dock.code;
+
+                    const tdPosition = document.createElement('td');
+                    tdPosition.textContent = `| x = ${dock.x} | y = ${dock.y || 0} | z = ${dock.z} |`;
+
+                    const tdInside = document.createElement('td');
+                    const dockStocks = stocks.filter(stock => stock.placeId === dock.id);
+                    if (dockStocks.length > 0) {
+                        dockStocks.forEach(stock => {
+                            const product = products.find(product => product.id === stock.productId);
+                            if (product) {
+                                const productInfo = document.createElement('div');
+                                productInfo.textContent = `${product.name} = ${stock.quantity} Units`;
+                                tdInside.appendChild(productInfo);
+                            }
+                        });
+                    } else {
+                        tdInside.textContent = 'No products found.';
+                    }
+
+                    trBody.appendChild(tdLocationCode);
+                    trBody.appendChild(tdParentCode);
+                    trBody.appendChild(tdPosition);
+                    trBody.appendChild(tdInside);
+                    tbody.appendChild(trBody);
+
+                    locationDetails.appendChild(table);
+                } else {
+                    console.log("Dock not found.");
+                }
+            }
+
+            function findStockByProductId(productId) {
                 return stocks.find(stock => stock.productId === productId);
             }
 
             window.searchProduct = function () {
                 const productCode = document.getElementById('productCode').value.trim().toUpperCase();
-
                 let found = false;
 
+                // Buscar en productos
                 const product = products.find(product => product.code.toUpperCase() === productCode);
                 if (product) {
-                    found = true;
                     const stock = findStockByProductId(product.id);
                     if (stock) {
-                        const location = transformedData.find(item => item.locations && item.locations.some(location => location.id === stock.placeId && location.placeTypeCode === 'Location'));
-                        if (location) {
-                            console.log(`Product found: ${productCode}. It will be highlighted`);
-                            highlightItem(location.x, location.z);
-                        } else {
-                            console.log(`Location not found for product: ${productCode}.`);
+                        for (const item of transformedData) {
+                            if (Array.isArray(item.locations)) {
+                                const location = item.locations.find(loc => loc.id === stock.placeId);
+                                if (location) {
+                                    highlightItem(location.x, location.z, true, 'Location');
+                                    displayLocationInfo(location.x, location.z);
+                                    found = true;
+                                    break;
+                                }
+                            }
                         }
-                    } else {
-                        console.log(`No stock found for product: ${productCode}.`);
                     }
                 }
 
+                // Buscar en transformedData
                 if (!found) {
-                    transformedData.forEach(item => {
+                    for (const item of transformedData) {
                         if (item.code && item.code.toUpperCase() === productCode) {
-                            found = true;
-                            if (item.placeTypeCode === 'User' || item.placeTypeCode === 'Dock' || item.placeTypeCode === 'Buffer') {
-                                console.log(`${productCode}. It will be highlighted`);
-                                highlightItem(item.x, item.z);
+                            if (item.placeTypeCode === 'User') {
+                                highlightItem(item.x, item.z, true, 'User');
+                                displayUserInfo(item.x, item.z);
+                                found = true;
+                            } else if (item.placeTypeCode === 'Dock') {
+                                highlightItem(item.x, item.z, true, 'Dock');
+                                displayDockInfo(item.x, item.z);
+                                found = true;
+                            } else if (item.placeTypeCode === 'Buffer') {
+                                highlightItem(item.x, item.z, true, 'Buffer');
+                                displayBufferInfo(item.x, item.z);
+                                found = true;
                             }
-                        } else if (item.locations) {
-                            item.locations.forEach(location => {
-                                if (location.code && location.code.toUpperCase() === productCode) {
-                                    found = true;
-                                    console.log(`Location found: ${productCode}. It will be highlighted`);
-                                    highlightItem(location.x, location.z);
-                                }
-                            });
                         }
-                    });
+
+                        // Buscar en ubicaciones anidadas
+                        if (!found && Array.isArray(item.locations)) {
+                            for (const location of item.locations) {
+                                if (location.code && location.code.toUpperCase() === productCode) {
+                                    highlightItem(location.x, location.z, true, 'Location');
+                                    displayLocationInfo(location.x, location.z);
+                                    found = true;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (found) break;
+                    }
                 }
 
                 if (!found) {
                     console.log(`Product not found: ${productCode}.`);
                 }
             };
+
+
 
             window.autocompleteSearch = function () {
                 let input = document.getElementById('productCode');
@@ -796,6 +1152,7 @@ html(lang="en")
                 });
             };
 
+<<<<<<< HEAD
             function highlightItem(x, z) {
                 removeHighlightAtPosition(x, z);
  
@@ -805,6 +1162,36 @@ html(lang="en")
                 viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
 
                 currentHighlights.push(square);
+=======
+            function highlightItem (x, z, center = false, type = 'default') {
+                if (highlightedSquare) {
+                    mapContainer.removeChild(highlightedSquare);
+                }
+
+                const elementType = type !== 'default' ? type : getElementType(x, z);
+                highlightedSquare = createSquare(x, z, true, elementType);
+                mapContainer.addChild(highlightedSquare);
+
+                if (center) {
+                    viewport.moveCenter(x * 25 + 12.5, z * 25 + 12.5);
+                }
+            }
+
+
+            function getElementType (x, z) {
+                switch (true) {
+                    case isUser(x, z):
+                        return 'User';
+                    case isDock(x, z):
+                        return 'Dock';
+                    case isBuffer(x, z):
+                        return 'Buffer';
+                    case isLocation(x, z):
+                        return 'Location';
+                    default:
+                        return 'default';
+                }
+>>>>>>> b7b9c33a836d5ef3a0bf8b9282b16e5ec4e7db27
             }
 
             function removeHighlightAtPosition(x, z) {
@@ -845,5 +1232,138 @@ html(lang="en")
             zoomOutButton.addEventListener('click', () => {
                 viewport.zoomPercent(-0.1);
                 console.log('Zoom Out clicked');
+            });
+
+            const ordersCtx = document.getElementById('ordersChart').getContext('2d');
+            const ordersChart = new Chart(ordersCtx, {
+                type: 'pie',
+                data: {
+                    labels: workload.orderTotals.map(order => order.typeCode),
+                    datasets: [{
+                        data: workload.orderTotals.map(order => order.numOrders),
+                        backgroundColor: ['red', 'blue', 'green', 'purple', 'orange'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: (value, ctx) => {
+                                let label = ctx.chart.data.labels[ctx.dataIndex];
+                                if (label.length > 6) {
+                                    return label.substring(0, 5) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            const tasksCtx = document.getElementById('tasksChart').getContext('2d');
+            const tasksChart = new Chart(tasksCtx, {
+                type: 'pie',
+                data: {
+                    labels: workload.taskTotals.map(task => task.code),
+                    datasets: [{
+                        data: workload.taskTotals.map(task => task.numTasks),
+                        backgroundColor: ['cyan', 'magenta', 'yellow', 'black'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: (value, ctx) => {
+                                let label = ctx.chart.data.labels[ctx.dataIndex];
+                                if (label.length > 6) {
+                                    return label.substring(0, 5) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+
+            const usersTasksCtx = document.getElementById('usersTasksChart').getContext('2d');
+            const usersTasksChart = new Chart(usersTasksCtx, {
+                type: 'pie',
+                data: {
+                    labels: workload.taskTotalsByUser
+                        .filter(task => task.numTasks > 0)
+                        .map(task => task.code),
+                    datasets: [{
+                        data: workload.taskTotalsByUser
+                            .filter(task => task.numTasks > 0)
+                            .map(task => task.numTasks),
+                        backgroundColor: ['pink', 'green', 'lime', 'teal'],
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (tooltipItem) {
+                                    return `${tooltipItem.label}: ${tooltipItem.raw}`;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            font: {
+                                size: 10,
+                                weight: 'bold'
+                            },
+                            formatter: (value, ctx) => {
+                                let label = ctx.chart.data.labels[ctx.dataIndex];
+                                if (label.length > 6) {
+                                    return label.substring(0, 5) + '...';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
             });
 

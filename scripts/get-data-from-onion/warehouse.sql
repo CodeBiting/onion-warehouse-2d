@@ -42,3 +42,6 @@ from place p inner join placechew pc on pc.childId = p.id
 where p.typeId in (1, 2, 5, 6, 8, 9)
 group by p.id, p.code, pst.code
 order by p.code;
+
+-- Place status type
+SELECT * FROM cbwms.placestatustype;
