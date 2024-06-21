@@ -10,7 +10,7 @@ const placeStatusTypesData = require('../data/placeStatusTypes.json');
 
 router.get('/', function (req, res, next) {
     const transformedData = jsonConvert('WH', warehouse, users);
-    res.render('warehouseMap', { data: transformedData, productsData, stocksData, placeStatusTypesData,warehouse});
+    res.render('warehouseMap', { data: transformedData, productsData, stocksData, placeStatusTypesData, warehouse });
 });
 
 module.exports = router;
